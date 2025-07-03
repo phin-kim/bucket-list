@@ -14,7 +14,7 @@ export default defineConfig({
         short_name: 'BucketList',
         description: 'Track your goals & dreams!',
         theme_color: '#580558',
-        background_color: '#ffffff',
+        background_color: '#580558',
         display: 'standalone',
         start_url: '/',
         icons: [
