@@ -10,9 +10,10 @@ function Bucket (){
 
     
     return(
-        <body>
+        <>
             <ProfilePicselector onSelect={handleSelect} />
-        </body>
+            
+        </>
     )
 }
 export default Bucket;
@@ -40,10 +41,19 @@ type Props ={
 }
 const ProfilePicselector = ({onSelect}: Props)=>{
     const [preview,setPreview] = useState<string>(defaultAvatars[0]);
+    const [show, setShow] = useState<boolean>(false);
+    const [formShow, setFormShow] = useState<boolean>(true);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const handleAvatarClick =(url: string)=>{
         setPreview(url);
         onSelect(url);
+    }
+
+    const handleAvatarDisplay =()=>{
+        setShow(prev => !prev);
+    }
+    const handleFormShow=()=>{
+        setFormShow(prev => !prev);
     }
     const handleFileChange =(e:React.ChangeEvent<HTMLInputElement>)=>{
         const file = e.target.files?.[0];
@@ -65,6 +75,7 @@ const ProfilePicselector = ({onSelect}: Props)=>{
     onSelect(file)
 
     }
+
     return(
         <div
             className="profilePicContainer"
@@ -77,36 +88,76 @@ const ProfilePicselector = ({onSelect}: Props)=>{
                 className="imagePreview"
             />
             {/*Default choices*/}
-            <div 
+            {show && (
+                <div 
                 className="defaultAvatarsContainer"
-            >
-                {defaultAvatars.map((src)=>(
-                    <button
-                    className="defaultAvatarButton"
-                        key={src}
-                        onClick={()=> handleAvatarClick(src)}
-                    >
-                        <img
-                            src={src}
-                            
-                            className="defaultAvatar"
-                            alt="Default Avatar"
-                        />
-                    </button>
-                ))}
-            </div>
+                >
+                    {defaultAvatars.map((src)=>(
+                        <button
+                        className="defaultAvatarButton"
+                            key={src}
+                            onClick={()=> handleAvatarClick(src)}
+                        >
+                            <img
+                                src={src}
+                                
+                                className="defaultAvatar"
+                                alt="Default Avatar"
+                            />
+                        </button>
+                    ))}
+                </div>
+            )}
+            
             {/*Upload */}
-            <label
+            <div className="toggleButtons">
+                <button
+                    className="avatarButton"
+                    onClick={()=>{
+                        handleAvatarDisplay()
+                        handleFormShow()
+                    }}
+                >Change avatar</button>
+                <label
                 className="choseFile"
-            >
-                👉 Upload Your Own Picture 👈
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                />
-            </label>
+                   
+                >
+                    Upload Pic
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                    />
+                </label>
+            </div>
+            <Form formShow={formShow}/>
+            
         </div>
+    )
+}
+type FormProp={
+    formShow:boolean;
+}
+//NB it can also be written as cont Form=({formShow}: FormProp)=>{}
+const Form: React.FC<FormProp> = ({formShow})=>{
+    return(
+        <>
+            {formShow &&(
+                <form>
+                <label>
+                    Nickname:
+                    <input type="text" name="name" />
+                </label>
+                <label>
+                    Email:
+                    <input type="email" name="email" />
+                </label>
+                <button type="submit">Submit</button>
+                </form>
+            )}
+            
+        </>
+        
     )
 }

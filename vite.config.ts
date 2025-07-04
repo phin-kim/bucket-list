@@ -13,7 +13,7 @@ export default defineConfig({
         name: 'Bucket List',
         short_name: 'BucketList',
         description: 'Track your goals & dreams!',
-        theme_color: '#580558',
+        theme_color: '#5a005a',
         background_color: '#580558',
         display: 'standalone',
         start_url: '/',
