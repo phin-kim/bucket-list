@@ -4,6 +4,8 @@ $cent:center;
 $rel:relative;
 $abs:absolute;
 $pix:12px;
+$back: #ffffff1a;
+$filt:blur(4px);
 $font:"Caveat Brush", cursive;
 @mixin toggleButton{
         padding: 0.25em 0.25em;
@@ -130,4 +132,74 @@ form{
         font-size: 1.6rem;
         font-weight: 600;
     }
+}
+header{
+    display: flex;
+    justify-content: $cent;
+    align-items: $cent;
+    //background:$back;
+    border-radius: $pix;
+    background: linear-gradient(135deg, #f983c0, #ff0280, #a259ff, #6a00f4);
+    background: linear-gradient(135deg, #440880 10%, #aa54f9 40%, #a13bf9 50%, #440880 100%);
+
+
+    //backdrop-filter: $filt;
+    height: 7em;
+    width: 100%;
+    z-index: 20;
+    position: sticky;
+    top: 0;
+    //box-shadow: 4px 4px 14px rgb(237, 235, 235)
+    font-family: $font;
+    width: 100%;
+    .profilePic{
+        width: 5em;
+        height: 5em;
+        position: $abs;
+        left: 80%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #a09e9e;
+    }
+    .avatarPlaceholder{
+        width: 5em;
+        height: 5em;
+        position: $abs;
+        display: flex;
+        justify-content: $cent;
+        align-items: $cent;
+        left: 80%;
+        border-radius: 50%;
+        font-size: 1rem;
+        font-weight: 700;
+        border: 4px solid #a09e9e;
+        h2{
+            font-size: 6rem;
+        }
+    }
+}
+.heroSection{
+    overflow-x: hidden;
+    h1{
+        color: transparent;
+        -webkit-text-stroke: 1px white;
+        -webkit-text-fill-color: transparent;
+        -webkit-background-clip: text;
+        background-clip: text;
+        font-size: 4rem;
+        text-align: center;
+        font-family: $font;
+    }
+    .backImage{
+        position: absolute;
+        top: 10em;
+        overflow-x: hidden;
+        left: 0;
+        width: 100%;
+        height: 70%;
+        z-index: -1;
+        //filter: $filt;
+        
+    }
+    
 }
