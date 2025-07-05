@@ -2,7 +2,6 @@ import React, { useState,useRef } from "react";
 import { db } from "../firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 function Bucket (){
     const [selectedImage,setSelectedImage] =useState<File | string | null>(null);
     const [profileSelector, setProfileSelector] = useState<boolean>(true);
@@ -171,14 +170,35 @@ const Form: React.FC<FormProp> = ({selectedImage,setProfileSelector})=>{
             const user = auth.currentUser;
             const uid =user ? user.uid :Math.random().toString(36).slice(2);
             let imgUrl ="";
-            if(selectedImage instanceof File){
+
+            /*if(selectedImage instanceof File){
                 const storage = getStorage();
                 const storageRef = ref(storage, `profilePics/${uid}/${selectedImage.name}`);
                 await uploadBytes(storageRef, selectedImage);
                 imgUrl = await getDownloadURL(storageRef);
-            } else if(typeof selectedImage === "string"){
+            }*/
+            if (selectedImage instanceof File) {
+                const data = new FormData();
+                data.append("file", selectedImage);
+                data.append("upload_preset", "PhinKim"); // <-- your preset name
+                data.append("folder", "profilePics");        // optional: Cloudinary folder
+
+                const res = await fetch("https://api.cloudinary.com/v1_1/dig44nwql/image/upload", {
+                    method: "POST",
+                    body: data,
+                });
+
+                const result = await res.json();
+                if (result.secure_url) {
+                    imgUrl = result.secure_url; // this is what you'll store in Firestore
+                } else {
+                    throw new Error("Upload failed: " + JSON.stringify(result));
+                }
+            }
+            else if(typeof selectedImage === "string"){
                 imgUrl = selectedImage;
             }
+            
             await addDoc(collection(db, "users"), {
                 uid,
                 nickname: form.nickname,
