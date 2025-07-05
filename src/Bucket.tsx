@@ -1,17 +1,23 @@
 import React, { useState,useRef } from "react";
-
+import { db } from "../firebase";
+import { collection, addDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 function Bucket (){
-
+    const [selectedImage,setSelectedImage] =useState<File | string | null>(null);
+    const [profileSelector, setProfileSelector] = useState<boolean>(true);
     // Handler for ProfilePicselector
     const handleSelect = (fileOrUrl: File | string) => {
-        // You can do more here, like uploading or previewing
+        setSelectedImage(fileOrUrl)
         console.log("Selected:", fileOrUrl);
     };
 
     
     return(
         <>
-            <ProfilePicselector onSelect={handleSelect} />
+            {profileSelector &&(
+                <ProfilePicselector setProfileSelector={setProfileSelector} onSelect={handleSelect} selectedImage={selectedImage} />
+            )}
             
         </>
     )
@@ -36,25 +42,34 @@ const defaultAvatars =[
     "/wonder.png",
     "/bigsmile.png",
 ]
+
 type Props ={
     onSelect: (fileOrUrl: File | string) => void;
+    selectedImage: File | string | null;
+    setProfileSelector:(show: boolean) => void;
 }
-const ProfilePicselector = ({onSelect}: Props)=>{
+
+const ProfilePicselector = ({onSelect,selectedImage, setProfileSelector}: Props)=>{
     const [preview,setPreview] = useState<string>(defaultAvatars[0]);
-    const [show, setShow] = useState<boolean>(false);
-    const [formShow, setFormShow] = useState<boolean>(true);
+    /*const [preview, setPreview] = useState<string>(
+        typeof selectedImage === "string" && selectedImage ? selectedImage : defaultAvatars[0]
+    );*/
+    //const [show, setShow] = useState<boolean>(false);
+    //const [formShow, setFormShow] = useState<boolean>(true);
+    const [showGrid, setShowGrid] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const handleAvatarClick =(url: string)=>{
         setPreview(url);
         onSelect(url);
+        setShowGrid(false);
     }
 
-    const handleAvatarDisplay =()=>{
-        setShow(prev => !prev);
-    }
-    const handleFormShow=()=>{
-        setFormShow(prev => !prev);
-    }
+    //const handleAvatarDisplay =()=>{
+    //    setShow(prev => !prev);
+    //}
+    //const handleFormShow=()=>{
+    //    setFormShow(prev => !prev);
+    //}
     const handleFileChange =(e:React.ChangeEvent<HTMLInputElement>)=>{
         const file = e.target.files?.[0];
         if(!file) return;
@@ -73,6 +88,7 @@ const ProfilePicselector = ({onSelect}: Props)=>{
     }
     setPreview(URL.createObjectURL(file));
     onSelect(file)
+    setShowGrid(false);
 
     }
 
@@ -88,7 +104,7 @@ const ProfilePicselector = ({onSelect}: Props)=>{
                 className="imagePreview"
             />
             {/*Default choices*/}
-            {show && (
+            {showGrid ? (
                 <div 
                 className="defaultAvatarsContainer"
                 >
@@ -107,6 +123,9 @@ const ProfilePicselector = ({onSelect}: Props)=>{
                         </button>
                     ))}
                 </div>
+            ):(
+                <Form  selectedImage={selectedImage} setProfileSelector={setProfileSelector}/>
+
             )}
             
             {/*Upload */}
@@ -114,13 +133,11 @@ const ProfilePicselector = ({onSelect}: Props)=>{
                 <button
                     className="avatarButton"
                     onClick={()=>{
-                        handleAvatarDisplay()
-                        handleFormShow()
+                        setShowGrid(prev =>!prev)
                     }}
                 >Change avatar</button>
                 <label
                 className="choseFile"
-                   
                 >
                     Upload Pic
                     <input
@@ -131,31 +148,87 @@ const ProfilePicselector = ({onSelect}: Props)=>{
                     />
                 </label>
             </div>
-            <Form formShow={formShow}/>
             
         </div>
     )
 }
 type FormProp={
-    formShow:boolean;
+    //formShow:boolean;
+    selectedImage: File | string | null;
+    setProfileSelector: (show: boolean) => void;
 }
 //NB it can also be written as cont Form=({formShow}: FormProp)=>{}
-const Form: React.FC<FormProp> = ({formShow})=>{
+const Form: React.FC<FormProp> = ({selectedImage,setProfileSelector})=>{
+    const [form,setForm] = useState<{nickname:string,email:string}>({
+        nickname: "",
+        email: ""
+    });
+    const [loading, setLoading] = useState<boolean>(false);
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setForm(prev => ({
+            ...prev,
+            [e.target.name]: e.target.value
+        }));
+    };
+    const handleDetailSave =async(e: React.FormEvent)=>{
+        e.preventDefault();
+        setLoading(true);
+        try{
+            const auth = getAuth();
+            const user = auth.currentUser;
+            const uid =user ? user.uid :Math.random().toString(36).slice(2);
+            let imgUrl ="";
+            if(selectedImage instanceof File){
+                const storage = getStorage();
+                const storageRef = ref(storage, `profilePics/${uid}/${selectedImage.name}`);
+                await uploadBytes(storageRef, selectedImage);
+                imgUrl = await getDownloadURL(storageRef);
+            } else if(typeof selectedImage === "string"){
+                imgUrl = selectedImage;
+            }
+            await addDoc(collection(db, "users"), {
+                uid,
+                nickname: form.nickname,
+                email: form.email,
+                avatar: imgUrl,
+                createdAt: new Date(),
+            });
+            alert("Details saved successfully!");
+        } catch(err){
+            alert("Error saving: " + (err as Error).message);
+        } finally {
+            setLoading(false);
+            setProfileSelector(false)
+        }
+    }
     return(
         <>
-            {formShow &&(
-                <form>
+            
+                <form onSubmit={handleDetailSave} >
                 <label>
                     Nickname:
-                    <input type="text" name="name" />
+                    <input 
+                        type="text" 
+                        name="nickname"
+                        value={form.nickname}
+                        onChange={handleChange}
+                        required    
+                    />
                 </label>
                 <label>
                     Email:
-                    <input type="email" name="email" />
+                    <input 
+                        type="email" 
+                        name="email"
+                        value={form.email}
+                        onChange={handleChange}
+                        required 
+                    />
                 </label>
-                <button type="submit">Submit</button>
+                <button type="submit" disabled={loading} >
+                    {loading ? "Saving..." : "Save Details"}
+                </button>
                 </form>
-            )}
             
         </>
         

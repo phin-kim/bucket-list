@@ -57,7 +57,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  height: 2.5em; /* added 'em' unit */
+  height: 2.8em; /* added 'em' unit */
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   width: 18em;
@@ -67,24 +67,24 @@ body {
           backdrop-filter: blur(10px);
 }
 .profilePicContainer .toggleButtons .avatarButton {
-  padding: 0.5em 1em;
+  padding: 0.25em 0.25em;
   border-radius: 10px;
   background-color: #ef7903;
   color: #fff;
   border: none;
   cursor: pointer;
   font-family: "Caveat Brush", cursive;
-  font-size: 1.2em;
+  font-size: 1.6em;
 }
 .profilePicContainer .toggleButtons .choseFile {
-  padding: 0.5em 1em;
+  padding: 0.25em 0.25em;
   border-radius: 10px;
   background-color: #ef7903;
   color: #fff;
   border: none;
   cursor: pointer;
   font-family: "Caveat Brush", cursive;
-  font-size: 1.2em;
+  font-size: 1.6em;
 }
 .profilePicContainer input[type=file] {
   display: none;
@@ -118,16 +118,16 @@ form input {
   outline: none;
 }
 form button {
-  padding: 0.5em 1em;
+  padding: 0.25em 0.25em;
   border-radius: 10px;
   background-color: #ef7903;
   color: #fff;
   border: none;
   cursor: pointer;
   font-family: "Caveat Brush", cursive;
-  font-size: 1.2em;
+  font-size: 1.6em;
   width: 100%;
   margin-top: 1em;
-  font-size: 1.2rem;
+  font-size: 1.6rem;
   font-weight: 600;
 }/*# sourceMappingURL=Bucket.css.map */
