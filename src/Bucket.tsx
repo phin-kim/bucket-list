@@ -54,8 +54,6 @@ const ProfilePicselector = ({onSelect,selectedImage, setProfileSelector}: Props)
     /*const [preview, setPreview] = useState<string>(
         typeof selectedImage === "string" && selectedImage ? selectedImage : defaultAvatars[0]
     );*/
-    //const [show, setShow] = useState<boolean>(false);
-    //const [formShow, setFormShow] = useState<boolean>(true);
     const [showGrid, setShowGrid] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const handleAvatarClick =(url: string)=>{
@@ -64,12 +62,7 @@ const ProfilePicselector = ({onSelect,selectedImage, setProfileSelector}: Props)
         setShowGrid(false);
     }
 
-    //const handleAvatarDisplay =()=>{
-    //    setShow(prev => !prev);
-    //}
-    //const handleFormShow=()=>{
-    //    setFormShow(prev => !prev);
-    //}
+    
     const handleFileChange =(e:React.ChangeEvent<HTMLInputElement>)=>{
         const file = e.target.files?.[0];
         if(!file) return;
@@ -135,7 +128,7 @@ const ProfilePicselector = ({onSelect,selectedImage, setProfileSelector}: Props)
                     onClick={()=>{
                         setShowGrid(prev =>!prev)
                     }}
-                >Change avatar</button>
+                >{showGrid ? "Fill Form":"Choose Avatar"}</button>
                 <label
                 className="choseFile"
                 >
