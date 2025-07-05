@@ -165,6 +165,7 @@ header .avatarPlaceholder {
   justify-content: center;
   align-items: center;
   left: 80%;
+  transform: rotate(-10deg);
   border-radius: 50%;
   font-size: 1rem;
   font-weight: 700;
