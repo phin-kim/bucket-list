@@ -3,6 +3,10 @@ import { db } from "../firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import {AnimatePresence, motion} from 'framer-motion';
+//import { MdAddCircle } from "react-icons/md";
+import { AiOutlinePlusCircle } from "react-icons/ai";
+import { FiUploadCloud } from "react-icons/fi"; 
+import { IoMdSettings } from "react-icons/io";
 type ProfileProps ={
     onSelect: (fileOrUrl: File | string) => void;
     selectedImage: File | string | null;
@@ -26,7 +30,7 @@ type HeaderProps ={
 }
 interface BucketFormProps{
     index:number,
-    onSave:(index:number,value:string)=> void
+    onSave:(index:number,data:BucketFormData)=> void
 }
 interface BucketFormData{
     title: string;
@@ -305,19 +309,25 @@ const Header =({imgUrl,nickName}:HeaderProps)=>{
             alt:"Desert dunes",
         },
     ]
-    useEffect(()=>{
-        const END_ANIMATION = 5 * 60 * 1000;
-        let timeout:ReturnType<typeof setTimeout>;
-        if(!images.length) return;
-        const interval = setInterval(() => {
-            timeout =setTimeout(() => {
-                setIndex(prev => (prev + 1) % images.length); 
-                }, 5000);
-            }, END_ANIMATION);
-             // Change every 5 seconds
+    useEffect(() => {
+        const END_ANIMATION = 5 * 60 * 1000; // 5 minutes
+        if (!images.length) return;
 
-        return () => {clearInterval(interval); clearTimeout(timeout);}   
-    },[images.length])
+    // Define interval and stopper
+        const interval: ReturnType<typeof setInterval> = setInterval(() => {
+            setIndex((prev) => (prev + 1) % images.length);
+        }, 5000); // every 5 seconds
+
+        const stopper: ReturnType<typeof setTimeout> = setTimeout(() => {
+            clearInterval(interval); // stop after 5 minutes
+        }, END_ANIMATION);
+
+        return () => {
+            clearInterval(interval);
+            clearTimeout(stopper);
+        };
+    }, [images.length]);
+
     const current  =images[index]
     
     return(
@@ -371,92 +381,57 @@ const BucketForm=({index,onSave}:BucketFormProps)=>{
     }
     return(
         <>
-            <div style={{
-                    border:"1px solid #e5e7eb",
-                    marginBottom:"1em",
-                    padding:"1em",
-                    borderRadius:"0.5em",
-                }}
+            <form className="bucketForm"
             >
-                <h2 style={{fontWeight:700,marginBottom:"0.5rem"}}>Bucket {index +1}</h2>
+                <h1 style={{fontWeight:700,marginBottom:"0.5rem"}}>Bucket {index +1}</h1>
+                <label htmlFor="title">Title</label>
                 <input 
                     type="text"
                     name="title"
                     value={formData.title}
                     onChange={handleChange}
-                    placeholder="title"
-                    style={{
-                        width:"100%",
-                        padding:"0.5em",
-                        borderRadius:"0.25em",
-                        border:"1px solid #e5e7eb",
-                        marginBottom:"0.5rem"
-                    }}
+                    placeholder="Enter title of activity"
+                    
                 />
+                <label htmlFor="description">Description</label>
                 <textarea
                     name="description"
                     placeholder="Description"
                     value={formData.description}
                     onChange={handleChange}
-                    style={{
-                        border: '1px solid #e5e7eb', 
-                        paddingLeft: '0.5rem',   
-                        paddingRight: '0.5rem',
-                        paddingTop: '0.25rem',       
-                        paddingBottom: '0.25rem',
-                        borderRadius: '0.25rem',     
-                        width: '100%',               
-                        marginBottom: '0.5rem',      
-                        boxSizing: 'border-box'      
-                    }}
+                    
                     rows={3}
                 />
+                <label htmlFor="date">Date</label>
                 <input
                     type="date"
                     name="date"
                     value={formData.date}
+                    placeholder="Select date to complete activity"
                     onChange={handleChange}
-                    style={{
-                        border: '1px solid #e5e7eb', 
-                        paddingLeft: '0.5rem',   
-                        paddingRight: '0.5rem',
-                        paddingTop: '0.25rem',       
-                        paddingBottom: '0.25rem',
-                        borderRadius: '0.25rem',     
-                        width: '100%',               
-                        marginBottom: '0.5rem',      
-                        boxSizing: 'border-box'      
-                    }}
+                    
                 />
 
                 <button
-                    style={{
-                        marginTop: '0.5rem',            // mt-2
-                        backgroundColor: '#0d9488',     // bg-teal-600
-                        color: '#ffffff',               // text-white
-                        paddingLeft: '1rem',            // px-4
-                        paddingRight: '1rem',
-                        paddingTop: '0.25rem',          // py-1
-                        paddingBottom: '0.25rem',
-                        borderRadius: '0.25rem',        // rounded
-                        border: 'none',                 // optional: remove default button border
-                        cursor: 'pointer',              // recommended for buttons
-                        transition: 'background-color 0.2s ease', // for hover effect
-                    }}
+                    
                     onClick={handleSave}
                     //disabled={!inputValue.trim()}
                 >
                     Save
                 </button>
-            </div>
+            </form>
         </>
     )
 }
 const BucketManager=()=>{
     const [buckets,setBuckets] = useState<number[]>([1]);
+    const [showButtons,setShowButtons] = useState<boolean>(false);
+    const handleButtons =(e:React.MouseEvent)=>{
+        e.stopPropagation()
+        setShowButtons(prev =>!prev);
+    }
     const addBucket=()=>{
         setBuckets(prev => [...prev, prev.length + 1]);
-        
     }
     const handleSave=(index:number,value:BucketFormData)=>{
         const isFomValid = value.title.trim() && value.description.trim() && value.date.trim();
@@ -468,6 +443,19 @@ const BucketManager=()=>{
         console.log(`Bucket ${index + 1} saved with value: ${value}`);
         // Optionally, you can clear the input or perform other actions
     }
+    const buttonContainerRef=useRef<HTMLDivElement | null>(null)
+    useEffect(()=>{
+        if(!showButtons) return;
+        const handleDisplay=(event:MouseEvent)=>{
+            if(buttonContainerRef.current && !buttonContainerRef.current.contains(event.target as Node)){
+                setShowButtons(false)
+            }
+        }
+        document.addEventListener("click",handleDisplay)
+        return ()=>{
+            document.removeEventListener("click",handleDisplay)
+        }
+    },[showButtons])
     return(
         <div
             style={{
@@ -484,26 +472,26 @@ const BucketManager=()=>{
                     onSave={handleSave} 
                 />
             ))}
-            <button
-                style={{
-                    display: 'block',          // block
-                    width: '100%',            // w-full
-                    backgroundColor: '#0d9488', // bg-teal-600
-                    color: '#ffffff',         // text-white
-                    paddingLeft: '1rem',      // px-4
-                    paddingRight: '1rem',
-                    paddingTop: '0.5rem',     // py-2
-                    paddingBottom: '0.5rem',
-                    borderRadius: '0.25rem',  // rounded
-                    border: 'none',           // optional: remove default button border
-                    cursor: 'pointer',        // recommended for buttons
-                    transition: 'background-color 0.2s ease', // for hover effect
-                }}
-                onClick={addBucket}
-            >
-                addBucket
-            </button>
-
+            <div ref={buttonContainerRef}>
+                {showButtons ?(
+                    <section className="bucketControlButtons">
+                        <button
+                            className="addButton"
+                            onClick={addBucket}
+                        >
+                            <AiOutlinePlusCircle size={50} title="Add anew bucket"/>
+                        </button>
+                        <button
+                            className="loadButton"
+                        >
+                            <FiUploadCloud size={50} title="load bucket history"/>
+                        </button>
+                    </section>
+                ):(
+                    <IoMdSettings className="showButtons" onClick={handleButtons}/>
+                )}
+            </div>
+            
         </div>
     )
 }

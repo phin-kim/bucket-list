@@ -7,6 +7,7 @@ $pix:12px;
 $back: #ffffff1a;
 $filt:blur(4px);
 $font:"Caveat Brush", cursive;
+$col:#c8c8c8;
 @mixin toggleButton{
         padding: 0.25em 0.25em;
         border-radius: 10px;
@@ -142,7 +143,6 @@ header{
     background: linear-gradient(135deg, #f983c0, #ff0280, #a259ff, #6a00f4);
     background: linear-gradient(135deg, #440880 10%, #aa54f9 40%, #a13bf9 50%, #440880 100%);
 
-
     //backdrop-filter: $filt;
     height: 7em;
     width: 100%;
@@ -193,6 +193,7 @@ header{
     }
     .backImage{
         position: absolute;
+        margin-top: 1em;
         top: 10em;
         overflow-x: hidden;
         left: 0;
@@ -203,4 +204,117 @@ header{
         
     }
     
+}
+.bucketForm{
+    display: grid;
+    margin-bottom: 0em;
+    width: 90%;
+    margin-right: 0rem;
+    padding: 1rem;
+    z-index: 1;
+    font-family: $font;
+    position: $rel;
+    float: right;
+    grid-template-columns: 1fr;
+    background: radial-gradient(circle, #ff69b4, #8a2be2);
+    border-radius: 25px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    &:first-child{
+        margin-top: 22em;
+    }
+    h1{
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color:$col;
+    }
+    label{
+        font-size: 2.5rem;
+        color: $col;
+
+        font-weight: 600;
+
+    }
+    input, textarea{
+        width: 90%;
+        padding: 0.2em;
+        border-radius: 0.25em;
+        border: 1px solid #e5e7eb;
+        margin-bottom: 0.5rem;
+        font-size: 1.5rem;
+        font-family: $font;
+    }
+    textarea{
+        height: 6em;
+        width: 80%;
+        &:focus{
+            outline: none;
+        }
+    }
+    button{
+        @include toggleButton;
+        width: 90%;
+        margin-top: 1em;
+        font-size: 2rem;
+        font-weight: 600;
+        background: linear-gradient(to right, #ff69b4, #8a2be2);
+        background: radial-gradient(circle, #ff69b4, #8a2be2);
+        color: $col;
+    }
+}
+.bucketControlButtons{
+    background: $back;
+    backdrop-filter: $filt;
+    position: fixed;
+    height: 10em;
+    width: 3.5em;
+    top: 10em;
+    left: 90%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 1em;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 10;
+    
+    .addButton{
+        @include toggleButton;
+        position: $abs;
+        top: 0.8em;
+        //left: 5%;
+        width: 2em;
+        height: 2em;
+        font-size: 2rem;
+        font-weight: 600;
+        z-index: 12;
+        border-radius: $pix;
+        background-color: #ef7903;
+        color:$col;
+    }
+    .loadButton{
+        @include toggleButton;
+        position: $abs;
+        top: 3.2em;
+        //left: 55%;
+        width: 2em;
+        height: 2em;
+        font-size: 2rem;
+        font-weight: 600;
+        z-index: 10;
+        border-radius: $pix;
+        background-color: #ef7903;
+        color:$col;
+    }
+}
+.showButtons{
+    height: 4em;
+    width: 4em;
+    position: fixed;
+    top: 10em;
+    left: 90%;
+    background: #440880;
+    border-radius: 12px;
 }

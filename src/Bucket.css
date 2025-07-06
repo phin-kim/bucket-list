@@ -190,10 +190,144 @@ header .avatarPlaceholder h2 {
 }
 .heroSection .backImage {
   position: absolute;
+  margin-top: 1em;
   top: 10em;
   overflow-x: hidden;
   left: 0;
   width: 100%;
   height: 70%;
   z-index: -1;
+}
+
+.bucketForm {
+  display: grid;
+  margin-bottom: 0em;
+  width: 90%;
+  margin-right: 0rem;
+  padding: 1rem;
+  z-index: 1;
+  font-family: "Caveat Brush", cursive;
+  position: relative;
+  float: right;
+  grid-template-columns: 1fr;
+  background: radial-gradient(circle, #ff69b4, #8a2be2);
+  border-radius: 25px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.bucketForm:first-child {
+  margin-top: 22em;
+}
+.bucketForm h1 {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #c8c8c8;
+}
+.bucketForm label {
+  font-size: 2.5rem;
+  color: #c8c8c8;
+  font-weight: 600;
+}
+.bucketForm input, .bucketForm textarea {
+  width: 90%;
+  padding: 0.2em;
+  border-radius: 0.25em;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+  font-family: "Caveat Brush", cursive;
+}
+.bucketForm textarea {
+  height: 6em;
+  width: 80%;
+}
+.bucketForm textarea:focus {
+  outline: none;
+}
+.bucketForm button {
+  padding: 0.25em 0.25em;
+  border-radius: 10px;
+  background-color: #ef7903;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-family: "Caveat Brush", cursive;
+  font-size: 1.6em;
+  width: 90%;
+  margin-top: 1em;
+  font-size: 2rem;
+  font-weight: 600;
+  background: linear-gradient(to right, #ff69b4, #8a2be2);
+  background: radial-gradient(circle, #ff69b4, #8a2be2);
+  color: #c8c8c8;
+}
+
+.bucketControlButtons {
+  background: rgba(255, 255, 255, 0.1019607843);
+  -webkit-backdrop-filter: blur(4px);
+          backdrop-filter: blur(4px);
+  position: fixed;
+  height: 10em;
+  width: 3.5em;
+  top: 10em;
+  left: 90%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1em;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+.bucketControlButtons .addButton {
+  padding: 0.25em 0.25em;
+  border-radius: 10px;
+  background-color: #ef7903;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-family: "Caveat Brush", cursive;
+  font-size: 1.6em;
+  position: absolute;
+  top: 0.8em;
+  width: 2em;
+  height: 2em;
+  font-size: 2rem;
+  font-weight: 600;
+  z-index: 12;
+  border-radius: 12px;
+  background-color: #ef7903;
+  color: #c8c8c8;
+}
+.bucketControlButtons .loadButton {
+  padding: 0.25em 0.25em;
+  border-radius: 10px;
+  background-color: #ef7903;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-family: "Caveat Brush", cursive;
+  font-size: 1.6em;
+  position: absolute;
+  top: 3.2em;
+  width: 2em;
+  height: 2em;
+  font-size: 2rem;
+  font-weight: 600;
+  z-index: 10;
+  border-radius: 12px;
+  background-color: #ef7903;
+  color: #c8c8c8;
+}
+
+.showButtons {
+  height: 4em;
+  width: 4em;
+  position: fixed;
+  top: 10em;
+  left: 90%;
+  background: #440880;
+  border-radius: 12px;
 }/*# sourceMappingURL=Bucket.css.map */
