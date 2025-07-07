@@ -1,12 +1,21 @@
-import React, { useState,useRef, useEffect } from "react";
+import React, { useState,useRef, useEffect, useInsertionEffect } from "react";
 import { db } from "../firebase";
 import { collection, addDoc } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import {
+    signInWithEmailAndPassword,
+    signInWithPopup,
+    onAuthStateChanged,
+    //User,
+    getAuth,
+    //UserCredential
+} from "firebase/auth";
+import { auth, googleProvider } from "../firebase";
 import {AnimatePresence, motion} from 'framer-motion';
 //import { MdAddCircle } from "react-icons/md";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import { FiUploadCloud } from "react-icons/fi"; 
 import { IoMdSettings } from "react-icons/io";
+import { span } from "framer-motion/client";
 type ProfileProps ={
     onSelect: (fileOrUrl: File | string) => void;
     selectedImage: File | string | null;
@@ -37,17 +46,55 @@ interface BucketFormData{
     description: string;
     date: string;
 }
+
+type SignInProps = {
+  email: string;
+  setEmail: (value: string) => void;
+
+  password: string;
+  setPassword: (value: string) => void;
+
+  error: string;
+  setError: (value: string) => void;
+
+  checkingSession: boolean;
+  setCheckingSession: (value: boolean) => void;
+};
+
+
 function Bucket (){
     const [selectedImage,setSelectedImage] =useState<File | string | null>(null);
     const [profileSelector, setProfileSelector] = useState<boolean>(true);
     const [imgUrl,setImgUrl] = useState<string | null>(null)
     const [nickName,setNickName] =useState<string|null>(null)
-
+    
     // Handler for ProfilePicselector
     const handleSelect = (fileOrUrl: File | string) => {
         setSelectedImage(fileOrUrl)
         console.log("Selected:", fileOrUrl);
     };
+    useEffect(()=>{
+        const saved =localStorage.getItem("profileSelector");
+        if(saved === "false"){
+            setProfileSelector(false)
+        }
+        
+    },[])
+    useEffect(()=>{
+        const handleBeforeUnload=()=>{
+            localStorage.setItem("profileSelector","false")
+        }
+        window.addEventListener("beforeunload",handleBeforeUnload)
+        return ()=>{
+            window.removeEventListener("beforeunload",handleBeforeUnload)
+        }
+    },[])
+    useEffect(() => {
+        if (profileSelector === true) {
+        localStorage.setItem("profileSelector", "true");
+        }
+    }, [profileSelector]);
+
     
     return(
         <>
@@ -58,6 +105,8 @@ function Bucket (){
             ):(<>
                     <Header imgUrl={imgUrl} nickName={nickName}/>
                     <BucketManager />
+                    <SignInGate/>
+
                 </>
             )}
             
@@ -190,6 +239,7 @@ const Form: React.FC<FormProps> = ({selectedImage,setProfileSelector,setImgUrl,s
         email: ""
     });
     const [loading, setLoading] = useState<boolean>(false);
+    
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm(prev => ({
             ...prev,
@@ -494,4 +544,51 @@ const BucketManager=()=>{
             
         </div>
     )
+}
+const SignInGate: React.FC=()=>{
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [checkingSession, setCheckingSession] = useState(true);
+
+    //Auth state
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+    useEffect(()=>{
+        const unsubscribe =onAuthStateChanged(auth,(user)=>{
+            setCurrentUser(user)
+            setCheckingSession(false)
+        })
+        return unsubscribe
+    },[]);
+
+    const handlEmailLogin =async ()=>{
+        setError("");
+        try{
+            await signInWithEmailAndPassword(auth,email,password);
+        }
+        catch(err:any){
+            setError(err.message)
+        }
+    }
+    const handleGoogleLogIn=async()=>{
+        setError("")
+        try{
+            await signInWithPopup(auth,googleProvider);
+
+        }
+        catch(err:any){
+            setError(err.message);
+        }
+    }
+    if(checkingSession){
+        return(
+            <span>we are checking credentials</span>
+        )
+    }
+    if(currentUser){
+        return(
+            <span>You already signed in</span>
+        )
+    }
 }
