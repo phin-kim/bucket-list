@@ -1,4 +1,5 @@
 import React, { useState,useRef, useEffect, } from "react";
+import { useNavigate } from "react-router-dom";
 import  { useAppStore } from "./states";
 import type { BucketFormData } from "./states";
 import type { User } from "firebase/auth";
@@ -76,10 +77,23 @@ const defaultAvatars =[
 
 const ProfilePicselector = ({onSelect}: ProfileProps)=>{
     const [preview,setPreview] = useState<string>(defaultAvatars[0]);
-    const {handleGoogleLogIn,error} = useAppStore();
-    /*const [preview, setPreview] = useState<string>(
-        typeof selectedImage === "string" && selectedImage ? selectedImage : defaultAvatars[0]
-    );*/
+    const {handleGoogleLogIn,setProfileSelector,error} = useAppStore();
+    const navigate =useNavigate()
+
+    const handleGoogle = async () => {
+        try {
+            await handleGoogleLogIn(); // This opens the popup
+            const user = auth.currentUser;
+            if (user) {
+            console.log("Logged in user:", user.displayName);
+            navigate("/");
+            setProfileSelector(false); // Navigate only after login success
+            }
+        } catch (err) {
+            console.error("Google sign-in failed:", err);
+        }
+    };
+
     const [showGrid, setShowGrid] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const handleAvatarClick =(url: string)=>{
@@ -165,16 +179,11 @@ const ProfilePicselector = ({onSelect}: ProfileProps)=>{
                     />
                 </label>
                 <button
-                    className="googleSignIn" onClick={handleGoogleLogIn}>
+                    className="googleSignIn" onClick={handleGoogle}>
                     Google Sign In
                 </button>
-                <span style={{
-                    color:"red",
-                    fontSize:"3rem",
-                    position:"fixed",
-                    top:0,
-                    right:0
-                }}>{error}</span>
+                <span className="errorMessage">{error}</span>
+                
             </div>
         </div>
     )
@@ -182,7 +191,7 @@ const ProfilePicselector = ({onSelect}: ProfileProps)=>{
 
 //NB it can also be written as cont Form=({formShow}: FormProp)=>{}
 const Form: React.FC = ()=>{
-    const {selectedImage,setProfileSelector, setImgUrl,setNickName,handleRegister,error}=useAppStore()
+    const {selectedImage,setProfileSelector, setImgUrl,setNickName,handleRegister}=useAppStore()
     const [form,setForm] = useState<{nickname:string,email:string,password:string}>({
         nickname: "",
         email: "",
@@ -294,13 +303,7 @@ const Form: React.FC = ()=>{
                 <button type="submit" disabled={loading} >
                     {loading ? "Saving..." : "Save Details"}
                 </button>
-                <span style={{
-                    color:"blue",
-                    fontSize:"3rem",
-                    position:"fixed",
-                    top:0,
-                    right:0
-                }}>{error}</span>
+                
                 </form>
         </>
     )
@@ -366,6 +369,7 @@ const Header =()=>{
             </header>
             <section className="heroSection">
                 <h1>Welcome, {nickName ?nickName.charAt(0).toUpperCase() + nickName.slice(1) : "Guest"}!</h1>
+
                 <AnimatePresence mode="wait">
                         <motion.img
                             key={current.src}

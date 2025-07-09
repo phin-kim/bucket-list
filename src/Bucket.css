@@ -140,6 +140,17 @@ form button {
   font-size: 1.6rem;
   font-weight: 600;
 }
+form .errorMessage {
+  position: relative;
+  height: 10em;
+  width: 15em;
+  text-align: center;
+  background: radial-gradient(circle at center, #ff4e4e 0%, #a10000 80%);
+  border-radius: 12px;
+  color: white;
+  font-family: "Caveat Brush", cursive;
+  z-index: 1;
+}
 
 header {
   display: flex;

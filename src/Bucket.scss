@@ -147,6 +147,21 @@ form{
         font-size: 1.6rem;
         font-weight: 600;
     }
+    .errorMessage{
+        position: $rel;
+        //top: 0;
+        //right: 0em;
+        height: 10em;
+        width: 15em;
+        text-align: $cent;
+        background: radial-gradient(circle at center, #ff4e4e 0%, #a10000 80%);
+        border-radius: $pix;
+        color: white;
+        font-family: $font;
+        z-index: 1;
+
+
+    }
 }
 header{
     display: flex;
