@@ -1,115 +1,54 @@
-import React, { useState,useRef, useEffect, useInsertionEffect } from "react";
+import React, { useState,useRef, useEffect, } from "react";
+import  { useAppStore } from "./states";
+import type { BucketFormData } from "./states";
+import type { User } from "firebase/auth";
 import { db } from "../firebase";
 import { collection, addDoc } from "firebase/firestore";
 import {
-    signInWithEmailAndPassword,
-    signInWithPopup,
+    
     onAuthStateChanged,
-    //User,
     getAuth,
     //UserCredential
 } from "firebase/auth";
-import { auth, googleProvider } from "../firebase";
+import { auth } from "../firebase";
 import {AnimatePresence, motion} from 'framer-motion';
 //import { MdAddCircle } from "react-icons/md";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import { FiUploadCloud } from "react-icons/fi"; 
-import { IoMdSettings } from "react-icons/io";
-import { span } from "framer-motion/client";
+import { IoMdMenu,IoMdLogIn,IoMdPersonAdd } from "react-icons/io";
+//import { span } from "framer-motion/client";
 type ProfileProps ={
     onSelect: (fileOrUrl: File | string) => void;
-    selectedImage: File | string | null;
-    setProfileSelector:(show: boolean) => void;
-    setImgUrl: (url: string) => void;
-    setNickName: (name: string) => void; 
-
 }
 
-type FormProps={
-    //formShow:boolean;
-    selectedImage: File | string | null;
-    setProfileSelector: (show: boolean) => void;
-    setImgUrl: (url: string) => void;
-    setNickName: (name: string) => void; 
-}
-
-type HeaderProps ={
-    imgUrl: string | null;
-    nickName: string | null;
-}
 interface BucketFormProps{
     index:number,
-    onSave:(index:number,data:BucketFormData)=> void
+    onSave: (index: number, data: BucketFormData) => void;
+    
 }
-interface BucketFormData{
-    title: string;
-    description: string;
-    date: string;
-}
-
-type SignInProps = {
-  email: string;
-  setEmail: (value: string) => void;
-
-  password: string;
-  setPassword: (value: string) => void;
-
-  error: string;
-  setError: (value: string) => void;
-
-  checkingSession: boolean;
-  setCheckingSession: (value: boolean) => void;
-};
-
 
 function Bucket (){
-    const [selectedImage,setSelectedImage] =useState<File | string | null>(null);
-    const [profileSelector, setProfileSelector] = useState<boolean>(true);
-    const [imgUrl,setImgUrl] = useState<string | null>(null)
-    const [nickName,setNickName] =useState<string|null>(null)
     
+    const {setSelectedImage,profileSelector} =useAppStore()
     // Handler for ProfilePicselector
     const handleSelect = (fileOrUrl: File | string) => {
         setSelectedImage(fileOrUrl)
         console.log("Selected:", fileOrUrl);
     };
-    useEffect(()=>{
-        const saved =localStorage.getItem("profileSelector");
-        if(saved === "false"){
-            setProfileSelector(false)
-        }
-        
-    },[])
-    useEffect(()=>{
-        const handleBeforeUnload=()=>{
-            localStorage.setItem("profileSelector","false")
-        }
-        window.addEventListener("beforeunload",handleBeforeUnload)
-        return ()=>{
-            window.removeEventListener("beforeunload",handleBeforeUnload)
-        }
-    },[])
-    useEffect(() => {
-        if (profileSelector === true) {
-        localStorage.setItem("profileSelector", "true");
-        }
-    }, [profileSelector]);
-
+    
     
     return(
         <>
             {profileSelector ?(
-                <ProfilePicselector setProfileSelector={setProfileSelector} onSelect={handleSelect} selectedImage={selectedImage} setImgUrl={setImgUrl}
-                setNickName={setNickName}
+                <ProfilePicselector  onSelect={handleSelect} 
                 />
-            ):(<>
-                    <Header imgUrl={imgUrl} nickName={nickName}/>
+            ):(
+                <>
+                    <Header />
                     <BucketManager />
                     <SignInGate/>
-
                 </>
             )}
-            
         </>
     )
 }
@@ -135,8 +74,9 @@ const defaultAvatars =[
 ]
 
 
-const ProfilePicselector = ({onSelect,selectedImage, setProfileSelector,setImgUrl,setNickName}: ProfileProps)=>{
+const ProfilePicselector = ({onSelect}: ProfileProps)=>{
     const [preview,setPreview] = useState<string>(defaultAvatars[0]);
+    const {handleGoogleLogIn,error} = useAppStore();
     /*const [preview, setPreview] = useState<string>(
         typeof selectedImage === "string" && selectedImage ? selectedImage : defaultAvatars[0]
     );*/
@@ -179,7 +119,6 @@ const ProfilePicselector = ({onSelect,selectedImage, setProfileSelector,setImgUr
             <img
                 src={preview}
                 alt="Profile Preview"
-                
                 className="imagePreview"
             />
             {/*Default choices*/}
@@ -195,7 +134,6 @@ const ProfilePicselector = ({onSelect,selectedImage, setProfileSelector,setImgUr
                         >
                             <img
                                 src={src}
-                                
                                 className="defaultAvatar"
                                 alt="Default Avatar"
                             />
@@ -203,7 +141,7 @@ const ProfilePicselector = ({onSelect,selectedImage, setProfileSelector,setImgUr
                     ))}
                 </div>
             ):(
-                <Form  selectedImage={selectedImage} setProfileSelector={setProfileSelector} setImgUrl={setImgUrl} setNickName={setNickName}/>
+                <Form />
 
             )}
             
@@ -218,7 +156,7 @@ const ProfilePicselector = ({onSelect,selectedImage, setProfileSelector,setImgUr
                 <label
                 className="choseFile"
                 >
-                    Upload Pic
+                    Upload Your Pic
                     <input
                         ref={fileInputRef}
                         type="file"
@@ -226,17 +164,29 @@ const ProfilePicselector = ({onSelect,selectedImage, setProfileSelector,setImgUr
                         onChange={handleFileChange}
                     />
                 </label>
+                <button
+                    className="googleSignIn" onClick={handleGoogleLogIn}>
+                    Google Sign In
+                </button>
+                <span style={{
+                    color:"red",
+                    fontSize:"3rem",
+                    position:"fixed",
+                    top:0,
+                    right:0
+                }}>{error}</span>
             </div>
-            
         </div>
     )
 }
 
 //NB it can also be written as cont Form=({formShow}: FormProp)=>{}
-const Form: React.FC<FormProps> = ({selectedImage,setProfileSelector,setImgUrl,setNickName})=>{
-    const [form,setForm] = useState<{nickname:string,email:string}>({
+const Form: React.FC = ()=>{
+    const {selectedImage,setProfileSelector, setImgUrl,setNickName,handleRegister,error}=useAppStore()
+    const [form,setForm] = useState<{nickname:string,email:string,password:string}>({
         nickname: "",
-        email: ""
+        email: "",
+        password:""
     });
     const [loading, setLoading] = useState<boolean>(false);
     
@@ -246,8 +196,9 @@ const Form: React.FC<FormProps> = ({selectedImage,setProfileSelector,setImgUrl,s
             [e.target.name]: e.target.value
         }));
     };
-    const handleDetailSave =async(e: React.FormEvent)=>{
-        e.preventDefault();
+    
+
+    const handleDetailSave =async()=>{
         setLoading(true);
         try{
             const auth = getAuth();
@@ -255,12 +206,7 @@ const Form: React.FC<FormProps> = ({selectedImage,setProfileSelector,setImgUrl,s
             const uid =user ? user.uid :Math.random().toString(36).slice(2);
             let imgUrl ="";
 
-            /*if(selectedImage instanceof File){
-                const storage = getStorage();
-                const storageRef = ref(storage, `profilePics/${uid}/${selectedImage.name}`);
-                await uploadBytes(storageRef, selectedImage);
-                imgUrl = await getDownloadURL(storageRef);
-            }*/
+            
             if (selectedImage instanceof File) {
                 const data = new FormData();
                 data.append("file", selectedImage);
@@ -294,19 +240,28 @@ const Form: React.FC<FormProps> = ({selectedImage,setProfileSelector,setImgUrl,s
             });
             setNickName(form.nickname);
 
-            alert("Details saved successfully!");
+            //alert("Details saved successfully!");
         } catch(err){
+            setProfileSelector(true)
             alert("Error saving: " + (err as Error).message);
         } finally {
             setLoading(false);
             setProfileSelector(false)
         }
     }
+    
     return(
         <>
             
-                <form onSubmit={handleDetailSave} >
-                <label>
+                <form onSubmit={async(e)=>{
+                    e.preventDefault();
+                    const result =await handleRegister(form.email,form.password);
+                    if(result==="success"){
+                        await handleDetailSave()
+                    }
+                }}
+                >
+                <label htmlFor="name">
                     Nickname:
                     <input 
                         type="text" 
@@ -316,7 +271,7 @@ const Form: React.FC<FormProps> = ({selectedImage,setProfileSelector,setImgUrl,s
                         required    
                     />
                 </label>
-                <label>
+                <label htmlFor="email">
                     Email:
                     <input 
                         type="email" 
@@ -326,15 +281,33 @@ const Form: React.FC<FormProps> = ({selectedImage,setProfileSelector,setImgUrl,s
                         required 
                     />
                 </label>
+                <label htmlFor="password">
+                    Password:
+                    <input
+                        type="password"
+                        name="password"
+                        onChange={handleChange}
+                        value={form.password}
+                        required
+                    />
+                </label>
                 <button type="submit" disabled={loading} >
                     {loading ? "Saving..." : "Save Details"}
                 </button>
+                <span style={{
+                    color:"blue",
+                    fontSize:"3rem",
+                    position:"fixed",
+                    top:0,
+                    right:0
+                }}>{error}</span>
                 </form>
         </>
     )
 }
 
-const Header =({imgUrl,nickName}:HeaderProps)=>{
+const Header =()=>{
+    const {imgUrl,nickName} =useAppStore()
     const initial = nickName ? nickName.charAt(0).toUpperCase() : "?";
     const [index,setIndex] =useState<number>(0);
     const images =[
@@ -413,22 +386,35 @@ const Header =({imgUrl,nickName}:HeaderProps)=>{
 //add a date set later on 
 const BucketForm=({index,onSave}:BucketFormProps)=>{
     //const [inputValue,setInputValue] =useState<string>("");
-    const [formData,setFormData]=useState<BucketFormData>({
-        title: "",
-        description: "",
-        date: "" // Date to be completed
-    })
+    const {bucketForms}=useAppStore();
+    const [formData, setFormData] = useState<BucketFormData>(
+    bucketForms[index] ?? { title: "", description: "", date: "" }
+    );
+
+    useEffect(() => {
+        setFormData(bucketForms[index] ?? { title: "", description: "", date: "" });
+    }, [bucketForms, index]);
 
     const handleChange=(e:React.ChangeEvent<HTMLInputElement |HTMLTextAreaElement >)=>{
         const {name,value}=e.target;
-        setFormData(prev => ({
+        setFormData((prev) => ({
             ...prev,
             [name]: value
         }));
     }
-    const handleSave =()=>{
+    const handleSave = () => {
+        const { title, description, date } = formData;
+        const isValid = title.trim() && description.trim() && date.trim();
+
+        if (!isValid) {
+        alert("Please fill in all fields.");
+        return;
+        }
+
+        //updateBucketForm(index, formData);
         onSave(index,formData)
-    }
+        console.log(`✅ Saved Bucket #${index + 1}`, formData);
+    };
     return(
         <>
             <form className="bucketForm"
@@ -463,8 +449,8 @@ const BucketForm=({index,onSave}:BucketFormProps)=>{
                 />
 
                 <button
-                    
-                    onClick={handleSave}
+                    type="button"
+                    onClick={()=>handleSave()}
                     //disabled={!inputValue.trim()}
                 >
                     Save
@@ -474,21 +460,29 @@ const BucketForm=({index,onSave}:BucketFormProps)=>{
     )
 }
 const BucketManager=()=>{
-    const [buckets,setBuckets] = useState<number[]>([1]);
+    const {
+        bucketForms,
+        addBucketForm,
+        setProfileSelector,
+        updateBucketForm,
+    }=useAppStore();
+    //const [buckets,setBuckets] = useState<number[]>([1]);
     const [showButtons,setShowButtons] = useState<boolean>(false);
+
     const handleButtons =(e:React.MouseEvent)=>{
         e.stopPropagation()
         setShowButtons(prev =>!prev);
     }
-    const addBucket=()=>{
+    /*const addBucket=()=>{
         setBuckets(prev => [...prev, prev.length + 1]);
-    }
+    }*/
     const handleSave=(index:number,value:BucketFormData)=>{
         const isFomValid = value.title.trim() && value.description.trim() && value.date.trim();
         if (!isFomValid) {
             alert("Please fill in all fields.");
             return;
         }
+        updateBucketForm(index,value);
         // Here you can save the value to your database or state management
         console.log(`Bucket ${index + 1} saved with value: ${value}`);
         // Optionally, you can clear the input or perform other actions
@@ -506,6 +500,12 @@ const BucketManager=()=>{
             document.removeEventListener("click",handleDisplay)
         }
     },[showButtons])
+    useEffect(() => {
+        if (bucketForms.length === 0) {
+            addBucketForm();
+        }
+    }, [bucketForms.length, addBucketForm]);
+
     return(
         <div
             style={{
@@ -515,7 +515,7 @@ const BucketManager=()=>{
                 marginRight: 'auto',
             }}
         >
-            {buckets.map((_,index)=>(
+            {bucketForms.map((_,index)=>(
                 <BucketForm 
                     key={index} 
                     index={index} 
@@ -527,18 +527,24 @@ const BucketManager=()=>{
                     <section className="bucketControlButtons">
                         <button
                             className="addButton"
-                            onClick={addBucket}
+                            onClick={addBucketForm}
                         >
                             <AiOutlinePlusCircle size={50} title="Add anew bucket"/>
                         </button>
                         <button
                             className="loadButton"
                         >
-                            <FiUploadCloud size={50} title="load bucket history"/>
+                            <FiUploadCloud size={50} title="load bucket history" />
+                        </button>
+                        <button className="logIn" title="log in to account">
+                            <IoMdLogIn size={50}/>
+                        </button>
+                        <button className="createAccount" title="create your account">
+                            <IoMdPersonAdd size={50} onClick={()=>setProfileSelector(true)}/>
                         </button>
                     </section>
                 ):(
-                    <IoMdSettings className="showButtons" onClick={handleButtons}/>
+                    <IoMdMenu size={80} className="showButtons" onClick={handleButtons}/>
                 )}
             </div>
             
@@ -546,10 +552,14 @@ const BucketManager=()=>{
     )
 }
 const SignInGate: React.FC=()=>{
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-    const [checkingSession, setCheckingSession] = useState(true);
+    const {
+        
+        checkingSession,
+        setCheckingSession,
+        
+    } = useAppStore();
+
+  
 
     //Auth state
     const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -560,9 +570,9 @@ const SignInGate: React.FC=()=>{
             setCheckingSession(false)
         })
         return unsubscribe
-    },[]);
+    },[setCheckingSession]);
 
-    const handlEmailLogin =async ()=>{
+    /*const handleEmailLogin =async ()=>{
         setError("");
         try{
             await signInWithEmailAndPassword(auth,email,password);
@@ -570,17 +580,8 @@ const SignInGate: React.FC=()=>{
         catch(err:any){
             setError(err.message)
         }
-    }
-    const handleGoogleLogIn=async()=>{
-        setError("")
-        try{
-            await signInWithPopup(auth,googleProvider);
-
-        }
-        catch(err:any){
-            setError(err.message);
-        }
-    }
+    }*/
+    
     if(checkingSession){
         return(
             <span>we are checking credentials</span>

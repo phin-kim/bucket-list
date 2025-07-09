@@ -49,18 +49,17 @@ body {
   border-width: 2px;
 }
 .profilePicContainer .toggleButtons {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-rows: repeat(3, 1fr);
   position: absolute;
   top: 12em;
-  left: 17%;
+  left: 30%;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  height: 2.8em; /* added 'em' unit */
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  width: 18em;
+  height: 10em; /* added 'em' unit */
+  padding: 0.5rem;
+  width: 10em;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.1019607843);
   -webkit-backdrop-filter: blur(10px);
@@ -86,16 +85,26 @@ body {
   font-family: "Caveat Brush", cursive;
   font-size: 1.6em;
 }
+.profilePicContainer .toggleButtons .googleSignIn {
+  padding: 0.25em 0.25em;
+  border-radius: 10px;
+  background-color: #ef7903;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-family: "Caveat Brush", cursive;
+  font-size: 1.6em;
+}
 .profilePicContainer input[type=file] {
   display: none;
 }
 
 form {
   display: grid;
-  margin-top: 4em;
+  margin-top: 10em;
   margin-bottom: 5em;
   width: 40%;
-  margin-right: 5rem;
+  margin-right: 0rem;
   padding: 1rem;
   z-index: 1;
   position: relative;
@@ -266,13 +275,13 @@ header .avatarPlaceholder h2 {
   -webkit-backdrop-filter: blur(4px);
           backdrop-filter: blur(4px);
   position: fixed;
-  height: 10em;
+  height: 20em;
   width: 3.5em;
   top: 10em;
   left: 90%;
   transform: translateX(-50%);
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-rows: repeat(4, 1fr);
   justify-content: center;
   align-items: center;
   gap: 1rem;
@@ -281,7 +290,7 @@ header .avatarPlaceholder h2 {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 10;
 }
-.bucketControlButtons .addButton {
+.bucketControlButtons button {
   padding: 0.25em 0.25em;
   border-radius: 10px;
   background-color: #ef7903;
@@ -290,33 +299,12 @@ header .avatarPlaceholder h2 {
   cursor: pointer;
   font-family: "Caveat Brush", cursive;
   font-size: 1.6em;
-  position: absolute;
-  top: 0.8em;
+  position: relative;
   width: 2em;
   height: 2em;
   font-size: 2rem;
   font-weight: 600;
   z-index: 12;
-  border-radius: 12px;
-  background-color: #ef7903;
-  color: #c8c8c8;
-}
-.bucketControlButtons .loadButton {
-  padding: 0.25em 0.25em;
-  border-radius: 10px;
-  background-color: #ef7903;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  font-family: "Caveat Brush", cursive;
-  font-size: 1.6em;
-  position: absolute;
-  top: 3.2em;
-  width: 2em;
-  height: 2em;
-  font-size: 2rem;
-  font-weight: 600;
-  z-index: 10;
   border-radius: 12px;
   background-color: #ef7903;
   color: #c8c8c8;
