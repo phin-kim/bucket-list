@@ -29,6 +29,9 @@ interface AppState {
     handleEmailLogin: () => Promise<void>;
     handleRegister:(email:string,password:string)=>Promise<"success" |"fail">
 
+    //user: null,
+    //setUser: (user) => set({ user }),
+    
     checkingSession: boolean;
     setCheckingSession: (value: boolean) => void;
 
@@ -56,7 +59,7 @@ interface AppState {
 export const useAppStore = create<AppState>((set,get) => {
     const setTimedError=(message:string,delay=1000,duration=4000)=>{
         set({error:""});
-         setTimeout(() => {
+        setTimeout(() => {
             set({error:message});
             setTimeout(() => {
                 set({error:""})
@@ -142,9 +145,10 @@ export const useAppStore = create<AppState>((set,get) => {
             }
         },
         handleEmailLogin: async () => {
+        const {email,password,} =get()
         set ({ error: "" });
         try {
-            await signInWithEmailAndPassword(auth, get().email, get().password);
+            await signInWithEmailAndPassword(auth, email, password);
         } catch (err) {
             const error = err as FirebaseError;
             let message = "An error occurred while signing in.";
@@ -164,8 +168,8 @@ export const useAppStore = create<AppState>((set,get) => {
             }
             }
             setTimedError(message);
-            console.log("Email:", get().email);
-            console.log("Password:", get().password);
+            console.log("Email:", email);
+            console.log("Password:", password);
             }
         },
         handleRegister:async(email:string,password:string,)=>{

@@ -47,7 +47,7 @@ function Bucket (){
                 <>
                     <Header />
                     <BucketManager />
-                    <SignInGate/>
+                    {/*<SignInGate/>*/}
                 </>
             )}
         </>
@@ -265,7 +265,13 @@ const Form: React.FC = ()=>{
                 <form onSubmit={async(e)=>{
                     e.preventDefault();
                     const result =await handleRegister(form.email,form.password);
+                    
                     if(result==="success"){
+                        useAppStore.setState({
+                            email: form.email,
+                            password: form.password,
+                        });
+                        await useAppStore.getState().handleEmailLogin();
                         await handleDetailSave()
                     }
                 }}
@@ -466,21 +472,18 @@ const BucketForm=({index,onSave}:BucketFormProps)=>{
 const BucketManager=()=>{
     const {
         bucketForms,
+        
         addBucketForm,
         setProfileSelector,
+        handleEmailLogin,
         updateBucketForm,
     }=useAppStore();
     //const [buckets,setBuckets] = useState<number[]>([1]);
     const [showButtons,setShowButtons] = useState<boolean>(false);
-
-    const handleButtons =(e:React.MouseEvent)=>{
-        e.stopPropagation()
-        setShowButtons(prev =>!prev);
-    }
-    /*const addBucket=()=>{
-        setBuckets(prev => [...prev, prev.length + 1]);
-    }*/
+    const [checkingSession, setCheckingSession] = useState(true);
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
     const handleSave=(index:number,value:BucketFormData)=>{
+    
         const isFomValid = value.title.trim() && value.description.trim() && value.date.trim();
         if (!isFomValid) {
             alert("Please fill in all fields.");
@@ -492,6 +495,19 @@ const BucketManager=()=>{
         // Optionally, you can clear the input or perform other actions
     }
     const buttonContainerRef=useRef<HTMLDivElement | null>(null)
+    const handleButtons =(e:React.MouseEvent)=>{
+        e.stopPropagation()
+        setShowButtons(prev =>!prev);
+    }
+    useEffect(() => {
+    const unsubscribe = onAuthStateChanged(getAuth(), (user) => {
+      setCurrentUser(user);
+      setCheckingSession(false);
+      console.log("🚀 Logged in as:", user?.email || "No user"); // done loading
+    });
+
+    return () => unsubscribe();
+  }, []);
     useEffect(()=>{
         if(!showButtons) return;
         const handleDisplay=(event:MouseEvent)=>{
@@ -540,8 +556,8 @@ const BucketManager=()=>{
                         >
                             <FiUploadCloud size={50} title="load bucket history" />
                         </button>
-                        <button className="logIn" title="log in to account">
-                            <IoMdLogIn size={50}/>
+                        <button className="logIn" title="log in to account"onClick={handleEmailLogin}>
+                            <IoMdLogIn size={50} />
                         </button>
                         <button className="createAccount" title="create your account">
                             <IoMdPersonAdd size={50} onClick={()=>setProfileSelector(true)}/>
@@ -550,12 +566,19 @@ const BucketManager=()=>{
                 ):(
                     <IoMdMenu size={80} className="showButtons" onClick={handleButtons}/>
                 )}
+                {checkingSession ?(
+                    <p>Checking Credentials...</p>
+                ):(
+                    !currentUser &&(
+                        <Form/>
+                    )
+                )}
             </div>
             
         </div>
     )
 }
-const SignInGate: React.FC=()=>{
+/*const SignInGate: React.FC=()=>{
     const {
         
         checkingSession,
@@ -576,15 +599,6 @@ const SignInGate: React.FC=()=>{
         return unsubscribe
     },[setCheckingSession]);
 
-    /*const handleEmailLogin =async ()=>{
-        setError("");
-        try{
-            await signInWithEmailAndPassword(auth,email,password);
-        }
-        catch(err:any){
-            setError(err.message)
-        }
-    }*/
     
     if(checkingSession){
         return(
@@ -596,4 +610,4 @@ const SignInGate: React.FC=()=>{
             <span>You already signed in</span>
         )
     }
-}
+}*/
