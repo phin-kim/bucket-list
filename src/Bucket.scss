@@ -237,6 +237,7 @@ header{
 .bucketForm{
     display: grid;
     margin-bottom: 0em;
+    margin-top: 2em;
     width: 90%;
     margin-right: 0rem;
     padding: 1rem;
@@ -249,7 +250,7 @@ header{
     border-radius: 25px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     &:first-child{
-        margin-top: 22em;
+        margin-top: 7em;
     }
     h1{
         font-weight: 700;
@@ -290,6 +291,7 @@ header{
         color: $col;
     }
 }
+
 .bucketControlButtons{
     background: $back;
     backdrop-filter: $filt;
@@ -314,15 +316,92 @@ header{
         @include toggleButton;
         @include bucketButton;
     }
+    span{
+        background: white;
+        position: $abs;
+        text-align: $cent;
+        right: 5em;
+        width:10em ;
+        font-family: $font;
+        font-size: 1.5rem;
+        border-radius: $pix;
+        height:2em;
+        padding-bottom: 1em;
+        &::after{
+            content: "";
+            position: $abs;
+            top: 19%; /* Position at the bottom of the tooltip */
+            left: 108%;
+            transform: translateX(-50%);
+            border-width: 1em;
+            border-style: solid;
+            border-color: transparent transparent transparent #fff;
+
+        }
+        &:first-of-type{
+            top: 0.5em;
+        }
+        &:nth-of-type(2){
+            top: 4.2em;
+        }
+        &:nth-of-type(3){
+            top: 7.8em;
+        }
+        &:nth-of-type(4){
+            top: 11.2em;
+        }
+
+    }
+
+}
+.bucketHistory{
+    height: 70vh;
+    width: 70%;
+    background: linear-gradient(135deg, #ff007f, #ff66b2, #ff99cc);
+    background: linear-gradient(135deg, #ff007f 0%, #e60073 50%, #ff66b2 100%);
+    color: $col;
+    z-index: 3;
+    position: $rel;
+    border-radius: $pix;
+    top: 0em;
+    //transform: rotateY(25deg);
+    left: 6em;
+    //perspective: 1000px;
+    padding: 1em;
+    .history{
+        position: $abs;
+        height: fit-content;
+        padding: 1em;
+        border-radius: $pix;
+        box-sizing: content-box;
+        background: red;
+        font-family: $font;
+        font-size: 1.5rem;
+        margin-bottom: 1em;
+
+    }
     
 
 }
 .showButtons{
-    height: 4em;
-    width: 4em;
+    height: 2em;
+    //width: 2em;
     position: fixed;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    z-index: 3;
     top: 10em;
-    left: 90%;
+    padding: 1rem;
+    left: 80%;
     background: #440880;
     border-radius: 12px;
+    span{
+        height: 0.25rem;
+        width: 3.5rem;
+        border-radius: 0.25rem;
+        background-color: black;
+
+    }
 }

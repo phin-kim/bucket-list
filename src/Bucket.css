@@ -222,6 +222,7 @@ header .avatarPlaceholder h2 {
 .bucketForm {
   display: grid;
   margin-bottom: 0em;
+  margin-top: 2em;
   width: 90%;
   margin-right: 0rem;
   padding: 1rem;
@@ -235,7 +236,7 @@ header .avatarPlaceholder h2 {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 .bucketForm:first-child {
-  margin-top: 22em;
+  margin-top: 7em;
 }
 .bucketForm h1 {
   font-weight: 700;
@@ -320,13 +321,84 @@ header .avatarPlaceholder h2 {
   background-color: #ef7903;
   color: #c8c8c8;
 }
+.bucketControlButtons span {
+  background: white;
+  position: absolute;
+  text-align: center;
+  right: 5em;
+  width: 10em;
+  font-family: "Caveat Brush", cursive;
+  font-size: 1.5rem;
+  border-radius: 12px;
+  height: 2em;
+  padding-bottom: 1em;
+}
+.bucketControlButtons span::after {
+  content: "";
+  position: absolute;
+  top: 19%; /* Position at the bottom of the tooltip */
+  left: 108%;
+  transform: translateX(-50%);
+  border-width: 1em;
+  border-style: solid;
+  border-color: transparent transparent transparent #fff;
+}
+.bucketControlButtons span:first-of-type {
+  top: 0.5em;
+}
+.bucketControlButtons span:nth-of-type(2) {
+  top: 4.2em;
+}
+.bucketControlButtons span:nth-of-type(3) {
+  top: 7.8em;
+}
+.bucketControlButtons span:nth-of-type(4) {
+  top: 11.2em;
+}
+
+.bucketHistory {
+  height: 70vh;
+  width: 70%;
+  background: linear-gradient(135deg, #ff007f, #ff66b2, #ff99cc);
+  background: linear-gradient(135deg, #ff007f 0%, #e60073 50%, #ff66b2 100%);
+  color: #c8c8c8;
+  z-index: 3;
+  position: relative;
+  border-radius: 12px;
+  top: 0em;
+  left: 6em;
+  padding: 1em;
+}
+.bucketHistory .history {
+  position: absolute;
+  height: -moz-fit-content;
+  height: fit-content;
+  padding: 1em;
+  border-radius: 12px;
+  box-sizing: content-box;
+  background: red;
+  font-family: "Caveat Brush", cursive;
+  font-size: 1.5rem;
+  margin-bottom: 1em;
+}
 
 .showButtons {
-  height: 4em;
-  width: 4em;
+  height: 2em;
   position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  z-index: 3;
   top: 10em;
-  left: 90%;
+  padding: 1rem;
+  left: 80%;
   background: #440880;
   border-radius: 12px;
+}
+.showButtons span {
+  height: 0.25rem;
+  width: 3.5rem;
+  border-radius: 0.25rem;
+  background-color: black;
 }/*# sourceMappingURL=Bucket.css.map */

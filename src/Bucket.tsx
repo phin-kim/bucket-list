@@ -1,10 +1,11 @@
 import React, { useState,useRef, useEffect, } from "react";
+import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import  { useAppStore } from "./states";
 import type { BucketFormData } from "./states";
 import type { User } from "firebase/auth";
 import { db } from "../firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, where,getDocs,query, Timestamp } from "firebase/firestore";
 import {
     
     onAuthStateChanged,
@@ -12,22 +13,35 @@ import {
     //UserCredential
 } from "firebase/auth";
 import { auth } from "../firebase";
-import {AnimatePresence, motion} from 'framer-motion';
+import { useAnimationControls,  type Variants } from "framer-motion";
+import {AnimatePresence, motion, } from 'framer-motion';
 //import { MdAddCircle } from "react-icons/md";
 import { AiOutlinePlusCircle } from "react-icons/ai";
-import { FiUploadCloud } from "react-icons/fi"; 
-import { IoMdMenu,IoMdLogIn,IoMdPersonAdd } from "react-icons/io";
+import { IoMdLogIn,IoMdPersonAdd } from "react-icons/io";
+import {  GiEmptyWoodBucketHandle } from "react-icons/gi";
 //import { span } from "framer-motion/client";
 type ProfileProps ={
     onSelect: (fileOrUrl: File | string) => void;
 }
-
+type BucketDetails={
+    title:string,
+    description:string,
+    date:string,
+    createdAt:Timestamp
+}
 interface BucketFormProps{
     index:number,
     onSave: (index: number, data: BucketFormData) => void;
     
 }
+interface HoverAnimateButtonsProps{
+    onClick?:()=>void;
+    icon:ReactNode;
+    text:string,
+    className?:string;
+    variants:Variants;
 
+}
 function Bucket (){
     
     const {setSelectedImage,profileSelector} =useAppStore()
@@ -47,7 +61,6 @@ function Bucket (){
                 <>
                     <Header />
                     <BucketManager />
-                    {/*<SignInGate/>*/}
                 </>
             )}
         </>
@@ -412,7 +425,7 @@ const BucketForm=({index,onSave}:BucketFormProps)=>{
             [name]: value
         }));
     }
-    const handleSave = () => {
+    const handleSave = async() => {
         const { title, description, date } = formData;
         const isValid = title.trim() && description.trim() && date.trim();
 
@@ -423,8 +436,26 @@ const BucketForm=({index,onSave}:BucketFormProps)=>{
 
         //updateBucketForm(index, formData);
         onSave(index,formData)
-        console.log(`✅ Saved Bucket #${index + 1}`, formData);
+        try{
+            const user  =getAuth().currentUser;
+            if(!user){
+                alert("Please Log In or Sign In to save buckets")
+                return;
+            }
+            await addDoc(collection(db,"buckets"),{
+                uid:user.uid,
+                ...formData,
+                createdAt:new Date(),
+            });
+            console.log(`✅ Bucket ${index + 1} saved to Firestore`, formData);
+        }
+        catch(error){
+            console.log("Failed to save bucket",error);
+            alert("Error saving bucket data .Please try again")
+        }
     };
+    
+    
     return(
         <>
             <form className="bucketForm"
@@ -472,7 +503,6 @@ const BucketForm=({index,onSave}:BucketFormProps)=>{
 const BucketManager=()=>{
     const {
         bucketForms,
-        
         addBucketForm,
         setProfileSelector,
         handleEmailLogin,
@@ -481,6 +511,7 @@ const BucketManager=()=>{
     //const [buckets,setBuckets] = useState<number[]>([1]);
     const [showButtons,setShowButtons] = useState<boolean>(false);
     const [checkingSession, setCheckingSession] = useState(true);
+    const [history,setHistory] =useState<BucketDetails[]>([])
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const handleSave=(index:number,value:BucketFormData)=>{
     
@@ -498,6 +529,16 @@ const BucketManager=()=>{
     const handleButtons =(e:React.MouseEvent)=>{
         e.stopPropagation()
         setShowButtons(prev =>!prev);
+    }
+    const loadBuckets = async()=>{
+        const user =getAuth().currentUser;
+        if(!user) return;
+        const q = query(collection(db,"buckets"),where("uid","==",user.uid))
+        const querySnapshot = await getDocs(q);
+
+        const bucketData =querySnapshot.docs.map(doc=>doc.data() as BucketDetails)
+        console.log("Fetched buckets",bucketData)
+        setHistory(bucketData)
     }
     useEffect(() => {
     const unsubscribe = onAuthStateChanged(getAuth(), (user) => {
@@ -525,16 +566,35 @@ const BucketManager=()=>{
             addBucketForm();
         }
     }, [bucketForms.length, addBucketForm]);
-
+    //FRAMER ANIMATIONS
+    const variants:Variants ={
+        initial:{
+            opacity:0,
+            scale:0,
+            z:-20
+        },
+        animate:{
+            opacity:1,
+            scale:1,
+            z:0,
+            transition:{
+                duration:0.4,
+                ease:"easeIn",
+                type:"spring",
+                damping:10,
+                stiffness:150
+            }
+        },
+    }
+    const lineVariants:Variants={
+        initial:{rotate:0,y:0,opacity:1},
+        topHover:{rotate:35,y:18},
+        middleHover:{opacity:0},
+        bottomHover:{rotate:-35,y:-10}
+    }
+    const [hovered,setHovered] =useState<boolean>(false)
     return(
-        <div
-            style={{
-                padding: '1rem',           // p-4 = 16px
-                maxWidth: '28rem',         // max-w-md = 448px (md = 28 * 16)
-                marginLeft: 'auto',        // mx-auto = horizontal center
-                marginRight: 'auto',
-            }}
-        >
+        <div>
             {bucketForms.map((_,index)=>(
                 <BucketForm 
                     key={index} 
@@ -545,26 +605,67 @@ const BucketManager=()=>{
             <div ref={buttonContainerRef}>
                 {showButtons ?(
                     <section className="bucketControlButtons">
-                        <button
+                        <HoverAnimatedButton
+                            icon={<AiOutlinePlusCircle size={50}  />}
+                            text="Add a New Bucket Item"
                             className="addButton"
                             onClick={addBucketForm}
-                        >
-                            <AiOutlinePlusCircle size={50} title="Add anew bucket"/>
-                        </button>
-                        <button
+                            //controls={controls}
+                            variants={variants}
+                        />
+
+                        <HoverAnimatedButton
+                            icon={<GiEmptyWoodBucketHandle size={50}  />}
+                            text="Load your Bucket History"
                             className="loadButton"
-                        >
-                            <FiUploadCloud size={50} title="load bucket history" />
-                        </button>
-                        <button className="logIn" title="log in to account"onClick={handleEmailLogin}>
-                            <IoMdLogIn size={50} />
-                        </button>
-                        <button className="createAccount" title="create your account">
-                            <IoMdPersonAdd size={50} onClick={()=>setProfileSelector(true)}/>
-                        </button>
+                            onClick={loadBuckets}
+                            //controls={controls}
+                            variants={variants}
+                        />
+
+                        <HoverAnimatedButton
+                            icon={<IoMdLogIn size={50} />}
+                            text="Login to Your Account"
+                            className="logIn"
+                            onClick={handleEmailLogin}
+                            //controls={controls}
+                            variants={variants}
+                        />
+                        <HoverAnimatedButton
+                            icon={<IoMdPersonAdd size={50} />}
+                            text="Create Your Account"
+                            className="createAccount"
+                            onClick={() => setProfileSelector(true)}
+                            //controls={controls}
+                            variants={variants}
+                        />
                     </section>
                 ):(
-                    <IoMdMenu size={80} className="showButtons" onClick={handleButtons}/>
+                    <motion.div
+                        onHoverStart={()=>setHovered(true)}
+                        onHoverEnd={()=>setHovered(false)}
+                        onClick={handleButtons}
+                        className="showButtons"
+                    >
+                        <motion.span
+                            variants={lineVariants}
+                            initial="initial"
+                            animate={hovered? "topHover":"initial"}
+                        />
+                        <motion.span
+                            variants={lineVariants}
+                            initial="initial"
+                            animate={hovered?"middleHover":"initial"}
+                        />
+                        <motion.span
+                            initial="initial"
+                            variants={lineVariants}
+                            animate={hovered? "bottomHover":"initial"}
+                            
+                        />
+                        {/*<IoMdMenu size={80} className="showButtons" onClick={handleButtons}/>*/}
+                    </motion.div>
+                    
                 )}
                 {checkingSession ?(
                     <p>Checking Credentials...</p>
@@ -574,40 +675,44 @@ const BucketManager=()=>{
                     )
                 )}
             </div>
-            
+            <section className="bucketHistory">
+                {[...history]
+                    .sort((a,b)=>b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime())
+                    .map((item,index)=>(
+                    <div key={index} className="history">
+                        <h3>{item.title}</h3>
+                        <p>{item.description}</p>
+                        <p>{item.date}</p>
+                    </div>
+                ))}
+            </section>
         </div>
     )
 }
-/*const SignInGate: React.FC=()=>{
-    const {
-        
-        checkingSession,
-        setCheckingSession,
-        
-    } = useAppStore();
+const HoverAnimatedButton=({
+    onClick,icon,text,className,variants
+}:HoverAnimateButtonsProps)=>{
+    const controls = useAnimationControls();
+    return(
+        <>
+            <motion.button
+                className={className}
+                onClick={onClick}
+                onHoverStart={() => controls.start("animate")}
+                onHoverEnd={() => controls.start("initial")}
+                onTapStart={()=>controls.start("animate")}
+                onTap={()=>controls.start("initial")}
+            >
+                {icon}
+            </motion.button>
+            <motion.span
+                variants={variants}
+                initial="initial"
+                animate={controls}
+            >
+                <p>{text}</p>
+            </motion.span>
+        </>
+    )
+}
 
-  
-
-    //Auth state
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
-
-    useEffect(()=>{
-        const unsubscribe =onAuthStateChanged(auth,(user)=>{
-            setCurrentUser(user)
-            setCheckingSession(false)
-        })
-        return unsubscribe
-    },[setCheckingSession]);
-
-    
-    if(checkingSession){
-        return(
-            <span>we are checking credentials</span>
-        )
-    }
-    if(currentUser){
-        return(
-            <span>You already signed in</span>
-        )
-    }
-}*/
