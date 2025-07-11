@@ -42,6 +42,7 @@ interface HoverAnimateButtonsProps{
     variants:Variants;
 
 }
+
 function Bucket (){
     
     const {setSelectedImage,profileSelector} =useAppStore()
@@ -512,9 +513,10 @@ const BucketManager=()=>{
     const [showButtons,setShowButtons] = useState<boolean>(false);
     const [checkingSession, setCheckingSession] = useState(true);
     const [history,setHistory] =useState<BucketDetails[]>([])
+    const[historyContainer,setHistoryContainer]=useState<boolean>(false)
     const [currentUser, setCurrentUser] = useState<User | null>(null);
+
     const handleSave=(index:number,value:BucketFormData)=>{
-    
         const isFomValid = value.title.trim() && value.description.trim() && value.date.trim();
         if (!isFomValid) {
             alert("Please fill in all fields.");
@@ -525,11 +527,17 @@ const BucketManager=()=>{
         console.log(`Bucket ${index + 1} saved with value: ${value}`);
         // Optionally, you can clear the input or perform other actions
     }
+
     const buttonContainerRef=useRef<HTMLDivElement | null>(null)
+    const historyContainerRef =useRef<HTMLElement | null> (null)
     const handleButtons =(e:React.MouseEvent)=>{
         e.stopPropagation()
         setShowButtons(prev =>!prev);
     }
+    const handleHistory=()=>{
+        setHistoryContainer(prev=>!prev)
+    }
+
     const loadBuckets = async()=>{
         const user =getAuth().currentUser;
         if(!user) return;
@@ -539,7 +547,9 @@ const BucketManager=()=>{
         const bucketData =querySnapshot.docs.map(doc=>doc.data() as BucketDetails)
         console.log("Fetched buckets",bucketData)
         setHistory(bucketData)
+        handleHistory();
     }
+    
     useEffect(() => {
     const unsubscribe = onAuthStateChanged(getAuth(), (user) => {
       setCurrentUser(user);
@@ -548,24 +558,34 @@ const BucketManager=()=>{
     });
 
     return () => unsubscribe();
-  }, []);
+    }, []);
     useEffect(()=>{
-        if(!showButtons) return;
+        if(!showButtons && !historyContainer) return;
         const handleDisplay=(event:MouseEvent)=>{
-            if(buttonContainerRef.current && !buttonContainerRef.current.contains(event.target as Node)){
+            if(showButtons && buttonContainerRef.current && !buttonContainerRef.current.contains(event.target as Node)){
                 setShowButtons(false)
             }
+            if(historyContainer &&historyContainerRef.current && !historyContainerRef.current.contains(event.target as Node)){
+                setHistoryContainer(false)
+            }
+
         }
         document.addEventListener("click",handleDisplay)
         return ()=>{
             document.removeEventListener("click",handleDisplay)
         }
-    },[showButtons])
+    },[showButtons,historyContainer])
     useEffect(() => {
         if (bucketForms.length === 0) {
             addBucketForm();
         }
     }, [bucketForms.length, addBucketForm]);
+    const length =history.length
+    const gridStyle:React.CSSProperties={
+        display:"grid",
+        gridTemplateRows:`repeat(${length},1fr)`,
+        gap:"10px"
+    }
     //FRAMER ANIMATIONS
     const variants:Variants ={
         initial:{
@@ -592,6 +612,9 @@ const BucketManager=()=>{
         middleHover:{opacity:0},
         bottomHover:{rotate:-35,y:-10}
     }
+
+    
+
     const [hovered,setHovered] =useState<boolean>(false)
     return(
         <div>
@@ -618,7 +641,9 @@ const BucketManager=()=>{
                             icon={<GiEmptyWoodBucketHandle size={50}  />}
                             text="Load your Bucket History"
                             className="loadButton"
-                            onClick={loadBuckets}
+                            onClick={()=>
+                                loadBuckets()
+                            }
                             //controls={controls}
                             variants={variants}
                         />
@@ -675,17 +700,58 @@ const BucketManager=()=>{
                     )
                 )}
             </div>
-            <section className="bucketHistory">
-                {[...history]
-                    .sort((a,b)=>b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime())
-                    .map((item,index)=>(
-                    <div key={index} className="history">
-                        <h3>{item.title}</h3>
-                        <p>{item.description}</p>
-                        <p>{item.date}</p>
-                    </div>
-                ))}
-            </section>
+            <AnimatePresence>
+                {historyContainer &&(
+                        <motion.section
+                            initial={{
+                                x:20,
+                                //scale:0,
+                                opacity:0
+                            }} 
+                            animate={{
+                                x:0,
+                                //scale:1,
+                                opacity:1
+                            }}
+                            exit={{
+                                x:-20,
+                                //scale:0,
+                                opacity:0
+                            }}
+                            
+                            transition={{duration:1.5,ease:"easeIn" ,type:"spring",
+                                damping:10,stiffness:150
+                            }}
+                            ref={historyContainerRef} 
+                            className="bucketHistory" 
+                            style={gridStyle}
+                        >
+                            <h2>Your Bucket History</h2>
+                            {[...history]
+                                .sort((a,b)=>b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime())
+                                .map((item,index)=>(
+                                <motion.div
+                                    key={index} 
+                                    className="history"
+                                    whileInView={{x:0, opacity:1}}
+                                    initial={{x:100, opacity:0}}
+                                    viewport={{once:true}}
+                                    transition={{
+                                        duration:8.8,ease:"easeOut",type:"spring",stiffness:150,damping:10
+                                    }}
+                                >
+                                    <h3>{item.title}</h3>
+                                    <p>{item.description}</p>
+                                    <p>{item.date}</p>
+                                </motion.div>
+                            ))}
+                            
+                        </motion.section>
+                    
+                )}
+            </AnimatePresence>
+            
+            
         </div>
     )
 }
@@ -715,4 +781,6 @@ const HoverAnimatedButton=({
         </>
     )
 }
+
+
 

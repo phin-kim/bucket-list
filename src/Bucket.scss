@@ -354,22 +354,32 @@ header{
     }
 
 }
+
 .bucketHistory{
     height: 70vh;
+    font-family: $font;
     width: 70%;
     background: linear-gradient(135deg, #ff007f, #ff66b2, #ff99cc);
     background: linear-gradient(135deg, #ff007f 0%, #e60073 50%, #ff66b2 100%);
     color: $col;
     z-index: 3;
-    position: $rel;
+    position: fixed;
     border-radius: $pix;
-    top: 0em;
+    top: 10em;
+    overflow-y: auto;
     //transform: rotateY(25deg);
-    left: 6em;
+    left: 7em;
     //perspective: 1000px;
     padding: 1em;
+    &::-webkit-scrollbar{
+        display: none;
+    }
+    h2{
+        text-align: $cent;
+        font-size: 2.6rem;
+    }
     .history{
-        position: $abs;
+        position: $rel;
         height: fit-content;
         padding: 1em;
         border-radius: $pix;
@@ -391,7 +401,7 @@ header{
     flex-direction: column;
     justify-content: space-between;
     cursor: pointer;
-    z-index: 3;
+    z-index: 4;
     top: 10em;
     padding: 1rem;
     left: 80%;

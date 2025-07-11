@@ -358,19 +358,28 @@ header .avatarPlaceholder h2 {
 
 .bucketHistory {
   height: 70vh;
+  font-family: "Caveat Brush", cursive;
   width: 70%;
   background: linear-gradient(135deg, #ff007f, #ff66b2, #ff99cc);
   background: linear-gradient(135deg, #ff007f 0%, #e60073 50%, #ff66b2 100%);
   color: #c8c8c8;
   z-index: 3;
-  position: relative;
+  position: fixed;
   border-radius: 12px;
-  top: 0em;
-  left: 6em;
+  top: 10em;
+  overflow-y: auto;
+  left: 7em;
   padding: 1em;
 }
+.bucketHistory::-webkit-scrollbar {
+  display: none;
+}
+.bucketHistory h2 {
+  text-align: center;
+  font-size: 2.6rem;
+}
 .bucketHistory .history {
-  position: absolute;
+  position: relative;
   height: -moz-fit-content;
   height: fit-content;
   padding: 1em;
@@ -389,7 +398,7 @@ header .avatarPlaceholder h2 {
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
-  z-index: 3;
+  z-index: 4;
   top: 10em;
   padding: 1rem;
   left: 80%;
