@@ -330,8 +330,28 @@ const Form: React.FC = ()=>{
 }
 
 const Header =()=>{
-    const {imgUrl,nickName} =useAppStore()
-    const initial = nickName ? nickName.charAt(0).toUpperCase() : "?";
+    //const {imgUrl,nickName} =useAppStore()
+    const [nickname,setNickname] =useState<string>("")
+    const [avatar,setAvatar] =useState<string>("");
+    const getName = async ()=>{
+        const user =getAuth().currentUser;
+        if(!user) return;
+        const profile =query(collection(db,"users"),where("uid","==",user.uid))
+        const profileSnapshot = await getDocs(profile)
+        if (profileSnapshot.empty) {
+        console.warn("🚫 No profile found for this user!");
+        return;
+        }
+        const profileData = profileSnapshot.docs.map(doc=> doc.data())
+        const nickname = profileData[0]?.nickname;
+        const avatar = profileData[0]?.avatar;
+        setNickname(nickname||"")
+        setAvatar(avatar || "");
+
+    }
+    getName()
+        window.addEventListener("DOMContentLoaded",getName);
+    const initial = nickname ? nickname.charAt(0).toUpperCase() : "?";
     const [index,setIndex] =useState<number>(0);
     const images =[
         {
@@ -379,8 +399,8 @@ const Header =()=>{
     return(
         <>
             <header>
-                {imgUrl?(
-                    <img className="profilePic" src={imgUrl} alt="" />
+                {avatar?(
+                    <img className="profilePic" src={avatar} alt="" />
                 ):(
                     <div className="avatarPlaceholder">
                         <h2>{initial}</h2>
@@ -388,7 +408,7 @@ const Header =()=>{
                 )}
             </header>
             <section className="heroSection">
-                <h1>Welcome, {nickName ?nickName.charAt(0).toUpperCase() + nickName.slice(1) : "Guest"}!</h1>
+                <h1>Welcome, {nickname ?nickname.charAt(0).toUpperCase() + nickname.slice(1) : "Guest"}!</h1>
 
                 <AnimatePresence mode="wait">
                         <motion.img
@@ -515,7 +535,8 @@ const BucketManager=()=>{
     const [history,setHistory] =useState<BucketDetails[]>([])
     const[historyContainer,setHistoryContainer]=useState<boolean>(false)
     const [currentUser, setCurrentUser] = useState<User | null>(null);
-
+    const [successMessage,setSuccessMessage]=useState<boolean>(false)
+    
     const handleSave=(index:number,value:BucketFormData)=>{
         const isFomValid = value.title.trim() && value.description.trim() && value.date.trim();
         if (!isFomValid) {
@@ -523,10 +544,14 @@ const BucketManager=()=>{
             return;
         }
         updateBucketForm(index,value);
+        setSuccessMessage(true)
         // Here you can save the value to your database or state management
         console.log(`Bucket ${index + 1} saved with value: ${value}`);
         // Optionally, you can clear the input or perform other actions
     }
+        setTimeout(() => {
+        setSuccessMessage(false)
+        }, 4000);
 
     const buttonContainerRef=useRef<HTMLDivElement | null>(null)
     const historyContainerRef =useRef<HTMLElement | null> (null)
@@ -537,7 +562,7 @@ const BucketManager=()=>{
     const handleHistory=()=>{
         setHistoryContainer(prev=>!prev)
     }
-
+    
     const loadBuckets = async()=>{
         const user =getAuth().currentUser;
         if(!user) return;
@@ -552,9 +577,9 @@ const BucketManager=()=>{
     
     useEffect(() => {
     const unsubscribe = onAuthStateChanged(getAuth(), (user) => {
-      setCurrentUser(user);
-      setCheckingSession(false);
-      console.log("🚀 Logged in as:", user?.email || "No user"); // done loading
+        setCurrentUser(user);
+        setCheckingSession(false);
+        console.log("🚀 Logged in as:", user?.email || "No user"); // done loading
     });
 
     return () => unsubscribe();
@@ -625,6 +650,31 @@ const BucketManager=()=>{
                     onSave={handleSave} 
                 />
             ))}
+
+            <AnimatePresence>
+                {successMessage &&(
+                    <motion.section
+                        initial={{
+                            y:-100,
+
+                            opacity:0
+                        }}
+                        animate={{
+                            y:0,
+                            opacity:1,
+                        }}
+                        exit={{
+                            y:100,
+                            opacity:0
+                        }}
+                        transition={{duration:0.8,ease:"backInOut",type:"spring",stiffness:120,damping:10}}
+                        className="saveAlert"
+                    >
+                        <h2>Bucket Successfully Saved</h2>
+                    </motion.section>
+                )}
+            </AnimatePresence>
+            
             <div ref={buttonContainerRef}>
                 {showButtons ?(
                     <section className="bucketControlButtons">
@@ -669,6 +719,8 @@ const BucketManager=()=>{
                     <motion.div
                         onHoverStart={()=>setHovered(true)}
                         onHoverEnd={()=>setHovered(false)}
+                        onTapStart={()=>setHovered(true)}
+                        onTap={()=>setHovered(false)}
                         onClick={handleButtons}
                         className="showButtons"
                     >
@@ -726,7 +778,7 @@ const BucketManager=()=>{
                             className="bucketHistory" 
                             style={gridStyle}
                         >
-                            <h2>Your Bucket History</h2>
+                            <h2>{history ?"Your Bucket History": "Your Bucket is Empty"}</h2>
                             {[...history]
                                 .sort((a,b)=>b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime())
                                 .map((item,index)=>(

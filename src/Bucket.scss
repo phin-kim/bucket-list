@@ -250,7 +250,7 @@ header{
     border-radius: 25px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     &:first-child{
-        margin-top: 7em;
+        margin-top: 23em;
     }
     h1{
         font-weight: 700;
@@ -414,4 +414,19 @@ header{
         background-color: black;
 
     }
+}
+.saveAlert{
+    height: fit-content;
+    border-radius: $pix;
+    width: fit-content;
+    padding: $pix;
+    bottom: 3em;
+    z-index: 7;
+    right: 1em;
+    background: radial-gradient(circle, #53ff53, #00a100);
+    position: fixed;
+    font-size: 1.5rem;
+    font-family: $font;
+
+
 }

@@ -177,7 +177,7 @@ export const useAppStore = create<AppState>((set,get) => {
             const trimmedEmail = email.trim();
             const trimmedPassword = password.trim()
             if(!trimmedEmail ||!trimmedPassword){
-                set({error:"Email and Password cnnotbe empty"});
+                set({error:"Email and Password cannot be empty"});
                 return "fail";
             }
             const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
