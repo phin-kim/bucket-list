@@ -534,7 +534,7 @@ const BucketManager=()=>{
     }=useAppStore();
     //const [buckets,setBuckets] = useState<number[]>([1]);
     const [showButtons,setShowButtons] = useState<boolean>(false);
-    const [checkingSession, setCheckingSession] = useState(true);
+    //const [checkingSession, setCheckingSession] = useState(true);
     const [history,setHistory] =useState<BucketData[]>([])
     const[historyContainer,setHistoryContainer]=useState<boolean>(false)
     const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -641,7 +641,7 @@ const BucketManager=()=>{
     useEffect(() => {
     const unsubscribe = onAuthStateChanged(getAuth(), (user) => {
         setCurrentUser(user);
-        setCheckingSession(false);
+        //setCheckingSession(false);
         console.log("🚀 Logged in as:", user?.email || "No user"); // done loading
     });
 
@@ -807,13 +807,9 @@ const BucketManager=()=>{
                     </motion.div>
                     
                 )}
-                {/*checkingSession ?(
-                    <p>Checking Credentials...</p>
-                ):(
-                    !currentUser &&(
-                        <Form/>
-                    )
-                )*/}
+                {!currentUser &&(
+                    <p>No User</p>
+                )}
             </div>
             <AnimatePresence>
                 {historyContainer &&(
