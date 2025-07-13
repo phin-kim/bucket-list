@@ -26,8 +26,64 @@ $col:#c8c8c8;
     font-weight: 600;
     z-index: 12;
     border-radius: $pix;
-    background-color: #ef7903;
+    background: linear-gradient(135deg, #ef7903 40%,#824100 80%, #512d02 100%);
+
     color:$col;
+}
+@mixin bucketFormStyles{
+    display: grid;
+    margin-bottom: 0em;
+    margin-top: 2em;
+    width: 90%;
+    margin-right: 0rem;
+    padding: 1rem;
+    z-index: 1;
+    font-family: $font;
+    position: $rel;
+    float: right;
+    grid-template-columns: 1fr;
+    background: radial-gradient(circle, #ff69b4, #8a2be2);
+    border-radius: 25px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    
+    h1{
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color:$col;
+    }
+    label{
+        font-size: 2.5rem;
+        color: $col;
+
+        font-weight: 600;
+
+    }
+    input, textarea{
+        width: 90%;
+        padding: 0.2em;
+        border-radius: 0.25em;
+        border: 1px solid #e5e7eb;
+        margin-bottom: 0.5rem;
+        font-size: 1.5rem;
+        font-family: $font;
+    }
+    textarea{
+        height: 6em;
+        width: 80%;
+        &:focus{
+            outline: none;
+        }
+    }
+    button{
+        @include toggleButton;
+        width: 90%;
+        margin-top: 1em;
+        font-size: 2rem;
+        font-weight: 600;
+        background: linear-gradient(to right, #ff69b4, #8a2be2);
+        background: radial-gradient(circle, #ff69b4, #8a2be2);
+        color: $col;
+    }
 }
 body{
     background: #09080d;
@@ -235,60 +291,9 @@ header{
     
 }
 .bucketForm{
-    display: grid;
-    margin-bottom: 0em;
-    margin-top: 2em;
-    width: 90%;
-    margin-right: 0rem;
-    padding: 1rem;
-    z-index: 1;
-    font-family: $font;
-    position: $rel;
-    float: right;
-    grid-template-columns: 1fr;
-    background: radial-gradient(circle, #ff69b4, #8a2be2);
-    border-radius: 25px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    &:first-child{
+    @include bucketFormStyles;
+    &:first-of-type{
         margin-top: 23em;
-    }
-    h1{
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        color:$col;
-    }
-    label{
-        font-size: 2.5rem;
-        color: $col;
-
-        font-weight: 600;
-
-    }
-    input, textarea{
-        width: 90%;
-        padding: 0.2em;
-        border-radius: 0.25em;
-        border: 1px solid #e5e7eb;
-        margin-bottom: 0.5rem;
-        font-size: 1.5rem;
-        font-family: $font;
-    }
-    textarea{
-        height: 6em;
-        width: 80%;
-        &:focus{
-            outline: none;
-        }
-    }
-    button{
-        @include toggleButton;
-        width: 90%;
-        margin-top: 1em;
-        font-size: 2rem;
-        font-weight: 600;
-        background: linear-gradient(to right, #ff69b4, #8a2be2);
-        background: radial-gradient(circle, #ff69b4, #8a2be2);
-        color: $col;
     }
 }
 
@@ -384,10 +389,39 @@ header{
         padding: 1em;
         border-radius: $pix;
         box-sizing: content-box;
-        background: red;
+        background: linear-gradient(135deg, #ff69b4, #8a2be2);
         font-family: $font;
         font-size: 1.5rem;
         margin-bottom: 1em;
+        h3{
+            font-size: 2rem;
+            span{
+                font-weight: 700;
+                color: black;
+            }
+        }
+        p{
+            font-size: 1.8rem;
+            span{
+                font-weight: 700;
+                color: black;
+
+            }
+        }
+        button{
+            @include toggleButton;
+            width: 90%;
+            margin-top: 1em;
+            font-size: 2rem;
+            font-weight: 600;
+            background: linear-gradient(to right, #ff69b4, #8a2be2);
+            background: radial-gradient(circle, #ff69b4, #8a2be2);
+            color: $col;
+        }
+        .editForm{
+            @include bucketFormStyles;
+            margin-top: 0em;
+        }
 
     }
     

@@ -52,6 +52,7 @@ interface AppState {
     bucketForms: BucketFormData[];
     updateBucketForm: (index: number, data: BucketFormData) => void;
     addBucketForm: () => void;
+    deleteBucketForm:(index:number)=>void;
 }
 
 
@@ -64,7 +65,7 @@ export const useAppStore = create<AppState>((set,get) => {
             setTimeout(() => {
                 set({error:""})
             },duration );
-         },delay );
+        },delay );
     }
     return {
         // Auth
@@ -107,6 +108,9 @@ export const useAppStore = create<AppState>((set,get) => {
                 ...state.bucketForms,
                 { title: "", description: "", date: "" },
             ],
+        })),
+        deleteBucketForm:(index)=>set((state)=>({
+            bucketForms:state.bucketForms.filter((_,i)=>i !==index)
         })),
         handleGoogleLogIn: async () => {
             set({ error: "" }); // clear errors before attempting

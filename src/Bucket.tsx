@@ -5,7 +5,7 @@ import  { useAppStore } from "./states";
 import type { BucketFormData } from "./states";
 import type { User } from "firebase/auth";
 import { db } from "../firebase";
-import { collection, addDoc, where,getDocs,query, Timestamp } from "firebase/firestore";
+import { collection,doc, addDoc, where,getDocs,query, Timestamp, deleteDoc,updateDoc } from "firebase/firestore";
 import {
     
     onAuthStateChanged,
@@ -19,6 +19,7 @@ import {AnimatePresence, motion, } from 'framer-motion';
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import { IoMdLogIn,IoMdPersonAdd } from "react-icons/io";
 import {  GiEmptyWoodBucketHandle } from "react-icons/gi";
+import type { FirebaseError } from "firebase/app";
 //import { span } from "framer-motion/client";
 type ProfileProps ={
     onSelect: (fileOrUrl: File | string) => void;
@@ -28,6 +29,9 @@ type BucketDetails={
     description:string,
     date:string,
     createdAt:Timestamp
+}
+type BucketData=BucketDetails &{
+    id:string
 }
 interface BucketFormProps{
     index:number,
@@ -409,7 +413,6 @@ const Header =()=>{
             </header>
             <section className="heroSection">
                 <h1>Welcome, {nickname ?nickname.charAt(0).toUpperCase() + nickname.slice(1) : "Guest"}!</h1>
-
                 <AnimatePresence mode="wait">
                         <motion.img
                             key={current.src}
@@ -421,7 +424,6 @@ const Header =()=>{
                             exit={{ opacity: 0, x: -50 }}
                             transition={{ duration: 0.5, delay: index * 0.2 }}
                         />
-
                 </AnimatePresence>
             </section>
         </>
@@ -500,7 +502,7 @@ const BucketForm=({index,onSave}:BucketFormProps)=>{
                     
                     rows={3}
                 />
-                <label htmlFor="date">Date</label>
+                <label htmlFor="date">Mission End Date</label>
                 <input
                     type="date"
                     name="date"
@@ -528,14 +530,21 @@ const BucketManager=()=>{
         setProfileSelector,
         handleEmailLogin,
         updateBucketForm,
+        //deleteBucketForm,
     }=useAppStore();
     //const [buckets,setBuckets] = useState<number[]>([1]);
     const [showButtons,setShowButtons] = useState<boolean>(false);
     const [checkingSession, setCheckingSession] = useState(true);
-    const [history,setHistory] =useState<BucketDetails[]>([])
+    const [history,setHistory] =useState<BucketData[]>([])
     const[historyContainer,setHistoryContainer]=useState<boolean>(false)
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [successMessage,setSuccessMessage]=useState<boolean>(false)
+    const [editId,setEditId] =useState<string | null >(null)
+    const [editForm,setEditForm]=useState({
+        title:"",
+        description:"",
+        date:"",
+    })
     
     const handleSave=(index:number,value:BucketFormData)=>{
         const isFomValid = value.title.trim() && value.description.trim() && value.date.trim();
@@ -569,12 +578,66 @@ const BucketManager=()=>{
         const q = query(collection(db,"buckets"),where("uid","==",user.uid))
         const querySnapshot = await getDocs(q);
 
-        const bucketData =querySnapshot.docs.map(doc=>doc.data() as BucketDetails)
+        const bucketData:BucketData[] =querySnapshot.docs.map(doc=>({
+            id:doc.id ,
+            ...doc.data() as BucketDetails
+        }))
         console.log("Fetched buckets",bucketData)
         setHistory(bucketData)
         handleHistory();
     }
-    
+    const deleteBucket=async(id:string)=>{
+        try{
+            await deleteDoc(doc(db, "buckets", id));
+            console.log("Deleted bucket:", id);
+            loadBuckets(); 
+        }
+        catch(err){
+            console.log("error deleteng bucket item",err as FirebaseError)
+        }
+    }
+    const startEditing=(bucket:BucketData)=>{
+        setEditId(bucket.id)
+        setEditForm({
+            title:bucket.title,
+            description:bucket.description,
+            date:bucket.date
+        })
+    }
+    const cancelEdit=()=>{
+        setEditForm({
+            title:"",
+            description:"",
+            date:"",
+        })
+        setEditId(null);
+    }
+    const handleEditChange=(e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>)=>{
+        const {name,value} =e.target
+        setEditForm((prev)=>({...prev,[name]:value}))
+    }
+    const saveEdit=async ()=>{
+        if(!editId)return;
+        const {title,description,date} =editForm;
+        const isFormValid =title.trim() && description.trim() && date.trim();
+        if(!isFormValid){
+            alert("Please fill in all the fields")
+            return;
+        }
+        try{
+            const bucketRef =doc(db,"buckets",editId);
+            await updateDoc(bucketRef,{
+                title,description,date,updatedAt:new Date()
+            })
+            console.log("✅ Bucket updated:", editId);
+            await loadBuckets();
+            cancelEdit();
+        }
+        catch(err){
+            console.error("❌ Error updating bucket:", err as FirebaseError);
+        }
+
+    }
     useEffect(() => {
     const unsubscribe = onAuthStateChanged(getAuth(), (user) => {
         setCurrentUser(user);
@@ -781,29 +844,58 @@ const BucketManager=()=>{
                             <h2>{history ?"Your Bucket History": "Your Bucket is Empty"}</h2>
                             {[...history]
                                 .sort((a,b)=>b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime())
-                                .map((item,index)=>(
+                                .map((item)=>(
                                 <motion.div
-                                    key={index} 
+                                    key={item.id} 
                                     className="history"
                                     whileInView={{x:0, opacity:1}}
                                     initial={{x:100, opacity:0}}
+                                    exit={{x:-100,opacity:0}}
                                     viewport={{once:true}}
                                     transition={{
                                         duration:8.8,ease:"easeOut",type:"spring",stiffness:150,damping:10
                                     }}
                                 >
-                                    <h3>{item.title}</h3>
-                                    <p>{item.description}</p>
-                                    <p>{item.date}</p>
+                                    {editId === item.id ?(
+                                        <form className="editForm" >
+                                            <label htmlFor="title">Title</label>
+                                            <input
+                                            name="title"
+                                            value={editForm.title}
+                                            onChange={handleEditChange}
+                                            />
+                                            <label htmlFor="textarea">Description</label>
+                                            <textarea
+                                            name="description"
+                                            typeof="text"
+                                            value={editForm.description}
+                                            onChange={handleEditChange}
+                                            />
+                                            <label htmlFor="date">Mission End Date</label>
+                                            <input
+                                            name="date"
+                                            type="date"
+                                            value={editForm.date}
+                                            onChange={handleEditChange}
+                                            />
+                                            <button type="button" onClick={saveEdit}>Save</button>
+                                            <button type="button" onClick={cancelEdit}>Cancel</button>
+                                        </form>
+                                    ):(
+                                        <>
+                                            <h3> <span>Your Adventure:</span>  {item.title}</h3>
+                                            <p> <span>Description:</span>  {item.description}</p>
+                                            <p> <span>Wish Deadline:</span>  {item.date}</p>
+                                            <button onClick={()=>startEditing(item)}>Edit Bucket</button>
+                                            <button onClick={()=>deleteBucket(item.id)}>Delete Bucket</button>
+                                        </>
+                                    )}
                                 </motion.div>
                             ))}
                             
                         </motion.section>
-                    
                 )}
             </AnimatePresence>
-            
-            
         </div>
     )
 }
