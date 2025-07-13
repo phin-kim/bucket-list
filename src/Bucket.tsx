@@ -1,6 +1,6 @@
 import React, { useState,useRef, useEffect, } from "react";
 import type { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import  { useAppStore } from "./states";
 import type { BucketFormData } from "./states";
 import type { User } from "firebase/auth";
@@ -96,7 +96,7 @@ const defaultAvatars =[
 const ProfilePicselector = ({onSelect}: ProfileProps)=>{
     const [preview,setPreview] = useState<string>(defaultAvatars[0]);
     const {handleGoogleLogIn,setProfileSelector,error} = useAppStore();
-    const navigate =useNavigate()
+    //const navigate =useNavigate()
 
     const handleGoogle = async () => {
         try {
@@ -104,7 +104,7 @@ const ProfilePicselector = ({onSelect}: ProfileProps)=>{
             const user = auth.currentUser;
             if (user) {
             console.log("Logged in user:", user.displayName);
-            navigate("/");
+            //navigate("/");
             setProfileSelector(false); // Navigate only after login success
             }
         } catch (err) {
@@ -807,13 +807,13 @@ const BucketManager=()=>{
                     </motion.div>
                     
                 )}
-                {checkingSession ?(
+                {/*checkingSession ?(
                     <p>Checking Credentials...</p>
                 ):(
                     !currentUser &&(
                         <Form/>
                     )
-                )}
+                )*/}
             </div>
             <AnimatePresence>
                 {historyContainer &&(

@@ -283,7 +283,7 @@ header{
         overflow-x: hidden;
         left: 0;
         width: 100%;
-        height: 70%;
+        height: 60%;
         z-index: -1;
         //filter: $filt;
         
@@ -293,7 +293,7 @@ header{
 .bucketForm{
     @include bucketFormStyles;
     &:first-of-type{
-        margin-top: 23em;
+        margin-top: 15em;
     }
 }
 

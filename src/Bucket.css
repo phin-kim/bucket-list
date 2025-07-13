@@ -215,7 +215,7 @@ header .avatarPlaceholder h2 {
   overflow-x: hidden;
   left: 0;
   width: 100%;
-  height: 70%;
+  height: 60%;
   z-index: -1;
 }
 
@@ -279,7 +279,7 @@ header .avatarPlaceholder h2 {
   color: #c8c8c8;
 }
 .bucketForm:first-of-type {
-  margin-top: 23em;
+  margin-top: 15em;
 }
 
 .bucketControlButtons {
