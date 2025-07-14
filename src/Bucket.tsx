@@ -55,6 +55,9 @@ function Bucket (){
         setSelectedImage(fileOrUrl)
         console.log("Selected:", fileOrUrl);
     };
+    window.addEventListener("load",()=>(
+        alert("fuck u sweetheart 😘❤")
+    ))
     return(
         <>
             {profileSelector ?(
