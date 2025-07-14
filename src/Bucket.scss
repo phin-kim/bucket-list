@@ -1,24 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Gloria+Hallelujah&display=swap');
-$dis:flex;
-$cent:center;
-$rel:relative;
-$abs:absolute;
-$pix:12px;
+@import url("https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Gloria+Hallelujah&display=swap");
+$dis: flex;
+$cent: center;
+$rel: relative;
+$abs: absolute;
+$pix: 12px;
 $back: #ffffff1a;
-$filt:blur(4px);
-$font:"Caveat Brush", cursive;
-$col:#c8c8c8;
-@mixin toggleButton{
-        padding: 0.25em 0.25em;
-        border-radius: 10px;
-        background-color: #ef7903;
-        color: #fff;
-        border: none;
-        cursor: pointer;
-        font-family: $font;
-        font-size: 1.6em;
+$filt: blur(4px);
+$font: "Caveat Brush", cursive;
+$col: #c8c8c8;
+@mixin toggleButton {
+    padding: 0.25em 0.25em;
+    border-radius: 10px;
+    background-color: #ef7903;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-family: $font;
+    font-size: 1.6em;
 }
-@mixin bucketButton{
+@mixin bucketButton {
     position: $rel;
     width: 2em;
     height: 2em;
@@ -26,16 +26,15 @@ $col:#c8c8c8;
     font-weight: 600;
     z-index: 12;
     border-radius: $pix;
-    background: linear-gradient(135deg, #ef7903 40%,#824100 80%, #512d02 100%);
-
-    color:$col;
+    background: linear-gradient(135deg, #ef7903 40%, #824100 80%, #512d02 100%);
+    color: $col;
 }
-@mixin bucketFormStyles{
+@mixin bucketFormStyles {
     display: grid;
     margin-bottom: 0em;
     margin-top: 2em;
     width: 90%;
-    margin-right: 0rem;
+    margin-right: 1rem;
     padding: 1rem;
     z-index: 1;
     font-family: $font;
@@ -44,21 +43,21 @@ $col:#c8c8c8;
     grid-template-columns: 1fr;
     background: radial-gradient(circle, #ff69b4, #8a2be2);
     border-radius: 25px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    
-    h1{
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+    h1 {
         font-weight: 700;
         margin-bottom: 0.5rem;
-        color:$col;
+        color: $col;
     }
-    label{
+    label {
         font-size: 2.5rem;
         color: $col;
 
         font-weight: 600;
-
     }
-    input, textarea{
+    input,
+    textarea {
         width: 90%;
         padding: 0.2em;
         border-radius: 0.25em;
@@ -67,14 +66,14 @@ $col:#c8c8c8;
         font-size: 1.5rem;
         font-family: $font;
     }
-    textarea{
+    textarea {
         height: 6em;
         width: 80%;
-        &:focus{
-            outline: none;
+        &:focus {
+        outline: none;
         }
     }
-    button{
+    button {
         @include toggleButton;
         width: 90%;
         margin-top: 1em;
@@ -85,10 +84,59 @@ $col:#c8c8c8;
         color: $col;
     }
 }
-body{
+@mixin historyGoalStyles{
+    height: 70vh;
+    font-family: $font;
+    width: 70%;
+    background: linear-gradient(135deg, #ff007f 0%, #e60073 50%, #ff66b2 100%);
+    color: $col;
+    z-index: 5;
+    position: fixed;
+    border-radius: $pix;
+    top: 10em;
+    overflow-y: auto;
+    left: 7em;
+    padding: 1em;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    h2 {
+        text-align: $cent;
+        font-size: 2.6rem;
+    }
+}
+@mixin historyStyles{
+    position: $rel;
+    height: fit-content;
+    padding: 1em;
+    border-radius: $pix;
+    box-sizing: content-box;
+    background: linear-gradient(135deg, #ff69b4, #8a2be2);
+    font-family: $font;
+    font-size: 1.5rem;
+    margin-bottom: 1em;
+    h3 {
+        font-size: 2rem;
+        span {
+            font-weight: 700;
+            color: black;
+        }
+    }
+    p {
+        font-size: 1.8rem;
+        span {
+            font-weight: 700;
+            color: black;
+        }
+        :last-of-type {
+            display: inline-block;
+        }
+    }
+}
+body {
     background: #09080d;
 }
-.profilePicContainer{
+.profilePicContainer {
     display: $dis;
     flex-direction: column;
     align-items: $cent;
@@ -96,14 +144,14 @@ body{
     height: 130vh;
     padding-top: 2em;
     width: 90%;
-    
+
     border-radius: 25px;
-    background: linear-gradient(to right, #ef7903 40%,#824100 80%, #512d02 100%);
+    background: linear-gradient(to right, #ef7903 40%, #824100 80%, #512d02 100%);
     position: $rel;
     top: 1em;
     font-family: $font;
     left: 4%;
-    .imagePreview{
+    .imagePreview {
         width: 7em;
         height: 7em;
         margin-bottom: 1em;
@@ -113,32 +161,32 @@ body{
         font-family: "Gloria Hallelujah", cursive;
         font-size: 1.2em;
     }
-    .defaultAvatarsContainer{
+    .defaultAvatarsContainer {
         display: grid;
         z-index: 4;
         margin-top: 4.5em;
-        grid-template-columns: repeat(3,minmax(0,1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 0.75rem;
-        .defaultAvatarButton{
-            border-radius: $pix;
-            border: none;
-            //background: transparent;
-            .defaultAvatar{
-                height:5rem;
-                width:5rem;
-                border-radius: 50%;
-                object-fit: cover;
-                border-width: 2px;
-            }
+        .defaultAvatarButton {
+        border-radius: $pix;
+        border: none;
+        //background: transparent;
+        .defaultAvatar {
+            height: 5rem;
+            width: 5rem;
+            border-radius: 50%;
+            object-fit: cover;
+            border-width: 2px;
+        }
         }
     }
-    
-    .toggleButtons{
+
+    .toggleButtons {
         //display: flex;
         //flex-direction: row;
         display: grid;
-        grid-template-rows: repeat(3,1fr);
-        position:$abs;
+        grid-template-rows: repeat(3, 1fr);
+        position: $abs;
         top: 12em;
         left: 30%;
         align-items: center;
@@ -150,26 +198,21 @@ body{
         border-radius: 12px;
         background: #ffffff1a;
         backdrop-filter: blur(10px);
-        .avatarButton{
-            @include toggleButton;
-            
+        .avatarButton {
+        @include toggleButton;
         }
-        .choseFile{
-            @include toggleButton;
+        .choseFile {
+        @include toggleButton;
         }
-        .googleSignIn{
-            @include toggleButton;
-
+        .googleSignIn {
+        @include toggleButton;
         }
-
     }
-    input[type="file"]{
-            display: none;
-        }
-    
-
+    input[type="file"] {
+        display: none;
+    }
 }
-form{
+form {
     display: grid;
     margin-top: 10em;
     margin-bottom: 5em;
@@ -180,11 +223,11 @@ form{
     position: $rel;
     float: right;
     grid-template-columns: 1fr;
-    label{
+    label {
         font-size: 1.5rem;
         font-weight: 600;
     }
-    input{
+    input {
         width: 100%;
         background: lightgray;
         z-index: 1;
@@ -194,16 +237,15 @@ form{
         border-radius: 5px;
         border: none;
         outline: none;
-        
     }
-    button{
+    button {
         @include toggleButton;
         width: 100%;
         margin-top: 1em;
         font-size: 1.6rem;
         font-weight: 600;
     }
-    .errorMessage{
+    .errorMessage {
         position: $rel;
         //top: 0;
         //right: 0em;
@@ -215,18 +257,22 @@ form{
         color: white;
         font-family: $font;
         z-index: 1;
-
-
     }
 }
-header{
+header {
     display: flex;
-    justify-content: $cent;
+    //justify-content: $cent;
     align-items: $cent;
     //background:$back;
     border-radius: $pix;
     background: linear-gradient(135deg, #f983c0, #ff0280, #a259ff, #6a00f4);
-    background: linear-gradient(135deg, #440880 10%, #aa54f9 40%, #a13bf9 50%, #440880 100%);
+    background: linear-gradient(
+        135deg,
+        #440880 10%,
+        #aa54f9 40%,
+        #a13bf9 50%,
+        #440880 100%
+    );
 
     //backdrop-filter: $filt;
     height: 7em;
@@ -237,7 +283,12 @@ header{
     //box-shadow: 4px 4px 14px rgb(237, 235, 235)
     font-family: $font;
     width: 100%;
-    .profilePic{
+    h1 {
+        font-size: 4rem;
+        float: left;
+        padding-left: 0.5em;
+    }
+    .profilePic {
         width: 5em;
         height: 5em;
         position: $abs;
@@ -246,7 +297,7 @@ header{
         object-fit: cover;
         border: 4px solid #a09e9e;
     }
-    .avatarPlaceholder{
+    .avatarPlaceholder {
         width: 5em;
         height: 5em;
         position: $abs;
@@ -259,45 +310,46 @@ header{
         font-size: 1rem;
         font-weight: 700;
         border: 4px solid #a09e9e;
-        h2{
-            font-size: 6rem;
+        h2 {
+        font-size: 6rem;
         }
     }
 }
-.heroSection{
+.heroSection {
     overflow-x: hidden;
-    h1{
+    position: $rel;
+    height: 40%;
+
+    h1 {
         color: transparent;
         -webkit-text-stroke: 1px white;
         -webkit-text-fill-color: transparent;
         -webkit-background-clip: text;
         background-clip: text;
         font-size: 4rem;
+        z-index: 4;
+        padding-left: 10px;
+        position: $abs;
         text-align: center;
         font-family: $font;
     }
-    .backImage{
-        position: absolute;
+    .backImage {
         margin-top: 1em;
         top: 10em;
         overflow-x: hidden;
         left: 0;
         width: 100%;
-        height: 60%;
+        height: 40%;
         z-index: -1;
+        border-radius: 1rem;
         //filter: $filt;
-        
     }
-    
 }
-.bucketForm{
+.bucketForm {
     @include bucketFormStyles;
-    &:first-of-type{
-        margin-top: 15em;
-    }
 }
 
-.bucketControlButtons{
+.bucketControlButtons {
     background: $back;
     backdrop-filter: $filt;
     position: fixed;
@@ -309,30 +361,30 @@ header{
     //display: flex;
     //flex-direction: row;
     display: grid;
-    grid-template-rows: repeat(4,1fr);
+    grid-template-rows: repeat(4, 1fr);
     justify-content: center;
     align-items: center;
     gap: 1rem;
     padding: 1em;
     border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 10;
-    button{
+    button {
         @include toggleButton;
         @include bucketButton;
     }
-    span{
+    span {
         background: white;
         position: $abs;
         text-align: $cent;
         right: 5em;
-        width:10em ;
+        width: 10em;
         font-family: $font;
         font-size: 1.5rem;
         border-radius: $pix;
-        height:2em;
+        height: 2em;
         padding-bottom: 1em;
-        &::after{
+        &::after {
             content: "";
             position: $abs;
             top: 19%; /* Position at the bottom of the tooltip */
@@ -341,74 +393,33 @@ header{
             border-width: 1em;
             border-style: solid;
             border-color: transparent transparent transparent #fff;
-
         }
-        &:first-of-type{
+        &:first-of-type {
             top: 0.5em;
         }
-        &:nth-of-type(2){
+        &:nth-of-type(2) {
             top: 4.2em;
         }
-        &:nth-of-type(3){
+        &:nth-of-type(3) {
             top: 7.8em;
         }
-        &:nth-of-type(4){
+        &:nth-of-type(4) {
             top: 11.2em;
         }
-
     }
-
 }
 
-.bucketHistory{
-    height: 70vh;
-    font-family: $font;
-    width: 70%;
-    background: linear-gradient(135deg, #ff007f, #ff66b2, #ff99cc);
-    background: linear-gradient(135deg, #ff007f 0%, #e60073 50%, #ff66b2 100%);
-    color: $col;
-    z-index: 3;
-    position: fixed;
-    border-radius: $pix;
-    top: 10em;
-    overflow-y: auto;
-    //transform: rotateY(25deg);
-    left: 7em;
-    //perspective: 1000px;
-    padding: 1em;
-    &::-webkit-scrollbar{
-        display: none;
-    }
-    h2{
-        text-align: $cent;
-        font-size: 2.6rem;
-    }
-    .history{
-        position: $rel;
-        height: fit-content;
-        padding: 1em;
-        border-radius: $pix;
-        box-sizing: content-box;
-        background: linear-gradient(135deg, #ff69b4, #8a2be2);
-        font-family: $font;
-        font-size: 1.5rem;
-        margin-bottom: 1em;
-        h3{
-            font-size: 2rem;
-            span{
-                font-weight: 700;
-                color: black;
-            }
+.bucketHistory {
+    @include historyGoalStyles;
+    
+    .history {
+        @include historyStyles;
+        input {
+            height: 1.2rem;
+            width: 1.2rem;
+            accent-color: rgb(173, 0, 188);
         }
-        p{
-            font-size: 1.8rem;
-            span{
-                font-weight: 700;
-                color: black;
-
-            }
-        }
-        button{
+        button {
             @include toggleButton;
             width: 90%;
             margin-top: 1em;
@@ -418,16 +429,13 @@ header{
             background: radial-gradient(circle, #ff69b4, #8a2be2);
             color: $col;
         }
-        .editForm{
+        .editForm {
             @include bucketFormStyles;
             margin-top: 0em;
         }
-
     }
-    
-
 }
-.showButtons{
+.showButtons {
     height: 2em;
     //width: 2em;
     position: fixed;
@@ -441,15 +449,14 @@ header{
     left: 80%;
     background: #440880;
     border-radius: 12px;
-    span{
+    span {
         height: 0.25rem;
         width: 3.5rem;
         border-radius: 0.25rem;
         background-color: black;
-
     }
 }
-.saveAlert{
+.saveAlert {
     height: fit-content;
     border-radius: $pix;
     width: fit-content;
@@ -461,6 +468,11 @@ header{
     position: fixed;
     font-size: 1.5rem;
     font-family: $font;
-
-
+}
+.completedContainer{
+    @include historyGoalStyles;
+    .completed{
+        position: $rel;
+        @include historyStyles;
+    }
 }

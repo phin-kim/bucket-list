@@ -7,20 +7,16 @@ import type { User } from "firebase/auth";
 import { db } from "../firebase";
 import { collection,doc, addDoc, where,getDocs,query, Timestamp, deleteDoc,updateDoc } from "firebase/firestore";
 import {
-    
     onAuthStateChanged,
     getAuth,
-    //UserCredential
 } from "firebase/auth";
 import { auth } from "../firebase";
-import { useAnimationControls,  type Variants } from "framer-motion";
+import {  useAnimationControls,  type Variants } from "framer-motion";
 import {AnimatePresence, motion, } from 'framer-motion';
-//import { MdAddCircle } from "react-icons/md";
 import { AiOutlinePlusCircle } from "react-icons/ai";
-import { IoMdLogIn,IoMdPersonAdd } from "react-icons/io";
-import {  GiEmptyWoodBucketHandle } from "react-icons/gi";
+import { IoMdPersonAdd } from "react-icons/io";
+import {  GiEmptyWoodBucketHandle,GiDiamondTrophy } from "react-icons/gi";
 import type { FirebaseError } from "firebase/app";
-//import { span } from "framer-motion/client";
 type ProfileProps ={
     onSelect: (fileOrUrl: File | string) => void;
 }
@@ -46,17 +42,19 @@ interface HoverAnimateButtonsProps{
     variants:Variants;
 
 }
+interface CompletedGoals{
+    completedGoals:BucketData[],
+    showGoals:boolean,
+    setGoals:(value: boolean)=>void
+}
 
 function Bucket (){
-    
     const {setSelectedImage,profileSelector} =useAppStore()
     // Handler for ProfilePicselector
     const handleSelect = (fileOrUrl: File | string) => {
         setSelectedImage(fileOrUrl)
         console.log("Selected:", fileOrUrl);
     };
-    
-    
     return(
         <>
             {profileSelector ?(
@@ -66,6 +64,7 @@ function Bucket (){
                 <>
                     <Header />
                     <BucketManager />
+                   
                 </>
             )}
         </>
@@ -91,8 +90,6 @@ const defaultAvatars =[
     "/wonder.png",
     "/bigsmile.png",
 ]
-
-
 const ProfilePicselector = ({onSelect}: ProfileProps)=>{
     const [preview,setPreview] = useState<string>(defaultAvatars[0]);
     const {handleGoogleLogIn,setProfileSelector,error} = useAppStore();
@@ -206,7 +203,6 @@ const ProfilePicselector = ({onSelect}: ProfileProps)=>{
         </div>
     )
 }
-
 //NB it can also be written as cont Form=({formShow}: FormProp)=>{}
 const Form: React.FC = ()=>{
     const {selectedImage,setProfileSelector, setImgUrl,setNickName,handleRegister}=useAppStore()
@@ -403,6 +399,7 @@ const Header =()=>{
     return(
         <>
             <header>
+                <h1>Tackly </h1>
                 {avatar?(
                     <img className="profilePic" src={avatar} alt="" />
                 ):(
@@ -436,6 +433,8 @@ const BucketForm=({index,onSave}:BucketFormProps)=>{
     const [formData, setFormData] = useState<BucketFormData>(
     bucketForms[index] ?? { title: "", description: "", date: "" }
     );
+    const [successMessage,setSuccessMessage]=useState<boolean>(false)
+
 
     useEffect(() => {
         setFormData(bucketForms[index] ?? { title: "", description: "", date: "" });
@@ -463,6 +462,7 @@ const BucketForm=({index,onSave}:BucketFormProps)=>{
             const user  =getAuth().currentUser;
             if(!user){
                 alert("Please Log In or Sign In to save buckets")
+                setSuccessMessage(false)
                 return;
             }
             await addDoc(collection(db,"buckets"),{
@@ -471,6 +471,11 @@ const BucketForm=({index,onSave}:BucketFormProps)=>{
                 createdAt:new Date(),
             });
             console.log(`✅ Bucket ${index + 1} saved to Firestore`, formData);
+            setSuccessMessage(true)
+
+            setTimeout(() => {
+                setSuccessMessage(false)
+            }, 4000);
         }
         catch(error){
             console.log("Failed to save bucket",error);
@@ -520,6 +525,29 @@ const BucketForm=({index,onSave}:BucketFormProps)=>{
                     Save
                 </button>
             </form>
+            <AnimatePresence>
+                {successMessage &&(
+                    <motion.section
+                        initial={{
+                            y:-100,
+
+                            opacity:0
+                        }}
+                        animate={{
+                            y:0,
+                            opacity:1,
+                        }}
+                        exit={{
+                            y:100,
+                            opacity:0
+                        }}
+                        transition={{duration:0.8,ease:"backInOut",type:"spring",stiffness:120,damping:10}}
+                        className="saveAlert"
+                    >
+                        <h2>Bucket Successfully Saved</h2>
+                    </motion.section>
+                )}
+            </AnimatePresence>
         </>
     )
 }
@@ -528,7 +556,6 @@ const BucketManager=()=>{
         bucketForms,
         addBucketForm,
         setProfileSelector,
-        handleEmailLogin,
         updateBucketForm,
         //deleteBucketForm,
     }=useAppStore();
@@ -538,7 +565,7 @@ const BucketManager=()=>{
     const [history,setHistory] =useState<BucketData[]>([])
     const[historyContainer,setHistoryContainer]=useState<boolean>(false)
     const [currentUser, setCurrentUser] = useState<User | null>(null);
-    const [successMessage,setSuccessMessage]=useState<boolean>(false)
+    //const [successMessage,setSuccessMessage]=useState<boolean>(false)
     const [editId,setEditId] =useState<string | null >(null)
     const [editForm,setEditForm]=useState({
         title:"",
@@ -547,20 +574,19 @@ const BucketManager=()=>{
     })
     
     const handleSave=(index:number,value:BucketFormData)=>{
+        
         const isFomValid = value.title.trim() && value.description.trim() && value.date.trim();
         if (!isFomValid) {
             alert("Please fill in all fields.");
             return;
         }
         updateBucketForm(index,value);
-        setSuccessMessage(true)
+        //setSuccessMessage(true)
         // Here you can save the value to your database or state management
         console.log(`Bucket ${index + 1} saved with value: ${value}`);
         // Optionally, you can clear the input or perform other actions
     }
-        setTimeout(() => {
-        setSuccessMessage(false)
-        }, 4000);
+        
 
     const buttonContainerRef=useRef<HTMLDivElement | null>(null)
     const historyContainerRef =useRef<HTMLElement | null> (null)
@@ -674,36 +700,32 @@ const BucketManager=()=>{
         gridTemplateRows:`repeat(${length},1fr)`,
         gap:"10px"
     }
-    //FRAMER ANIMATIONS
-    const variants:Variants ={
-        initial:{
-            opacity:0,
-            scale:0,
-            z:-20
-        },
-        animate:{
-            opacity:1,
-            scale:1,
-            z:0,
-            transition:{
-                duration:0.4,
-                ease:"easeIn",
-                type:"spring",
-                damping:10,
-                stiffness:150
-            }
-        },
-    }
-    const lineVariants:Variants={
-        initial:{rotate:0,y:0,opacity:1},
-        topHover:{rotate:35,y:18},
-        middleHover:{opacity:0},
-        bottomHover:{rotate:-35,y:-10}
-    }
-
-    
 
     const [hovered,setHovered] =useState<boolean>(false)
+    const [checkedItems,setIsChecked]= useState<{[id:string]:boolean}>({})
+    const [completedGoals,setCompleted]=useState<BucketData[]>([])
+    const [showGoals,setGoals] =useState<boolean>(false) 
+   
+
+    const deleteHistory=(id:string)=>{
+        if(!id) return;
+        setIsChecked(prev => ({ ...prev, [id]: true }));
+        setTimeout(() => {
+            const complete = history.filter(item => item.id === id);
+            setCompleted(prev => [...prev, ...complete]);
+            setHistory(history.filter(item => item.id !== id));
+
+            // Clean up checkedItems
+            setIsChecked(prev => {
+                const updated = { ...prev };
+                delete updated[id];
+                return updated;
+            });
+        }, 800);
+    }
+    const handleGoals=()=>{
+        setGoals(prev=> !prev)
+    }
     return(
         <div>
             {bucketForms.map((_,index)=>(
@@ -713,41 +735,23 @@ const BucketManager=()=>{
                     onSave={handleSave} 
                 />
             ))}
-
-            <AnimatePresence>
-                {successMessage &&(
-                    <motion.section
-                        initial={{
-                            y:-100,
-
-                            opacity:0
-                        }}
-                        animate={{
-                            y:0,
-                            opacity:1,
-                        }}
-                        exit={{
-                            y:100,
-                            opacity:0
-                        }}
-                        transition={{duration:0.8,ease:"backInOut",type:"spring",stiffness:120,damping:10}}
-                        className="saveAlert"
-                    >
-                        <h2>Bucket Successfully Saved</h2>
-                    </motion.section>
-                )}
-            </AnimatePresence>
             
             <div ref={buttonContainerRef}>
                 {showButtons ?(
-                    <section className="bucketControlButtons">
+                    <motion.section
+                        variants={modalVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="initial"
+                        className="bucketControlButtons"
+                    >
                         <HoverAnimatedButton
                             icon={<AiOutlinePlusCircle size={50}  />}
                             text="Add a New Bucket Item"
                             className="addButton"
                             onClick={addBucketForm}
                             //controls={controls}
-                            variants={variants}
+                            variants={hoverButtonVariants}
                         />
 
                         <HoverAnimatedButton
@@ -758,16 +762,16 @@ const BucketManager=()=>{
                                 loadBuckets()
                             }
                             //controls={controls}
-                            variants={variants}
+                            variants={hoverButtonVariants}
                         />
 
                         <HoverAnimatedButton
-                            icon={<IoMdLogIn size={50} />}
-                            text="Login to Your Account"
+                            icon={<GiDiamondTrophy size={50} />}
+                            text="View Your Achieved Goals"
                             className="logIn"
-                            onClick={handleEmailLogin}
+                            onClick={handleGoals}
                             //controls={controls}
-                            variants={variants}
+                            variants={hoverButtonVariants}
                         />
                         <HoverAnimatedButton
                             icon={<IoMdPersonAdd size={50} />}
@@ -775,9 +779,11 @@ const BucketManager=()=>{
                             className="createAccount"
                             onClick={() => setProfileSelector(true)}
                             //controls={controls}
-                            variants={variants}
+                            variants={hoverButtonVariants}
                         />
-                    </section>
+                    </motion.section>
+                    
+
                 ):(
                     <motion.div
                         onHoverStart={()=>setHovered(true)}
@@ -808,7 +814,7 @@ const BucketManager=()=>{
                     
                 )}
                 {!currentUser &&(
-                    <p>No User</p>
+                    <p></p>
                 )}
             </div>
             <AnimatePresence>
@@ -837,61 +843,110 @@ const BucketManager=()=>{
                             className="bucketHistory" 
                             style={gridStyle}
                         >
-                            <h2>{history ?"Your Bucket History": "Your Bucket is Empty"}</h2>
+                            <h2>{history.length>0 ?"Your Bucket History": "Your Bucket is Empty"}</h2>
                             {[...history]
                                 .sort((a,b)=>b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime())
-                                .map((item)=>(
-                                <motion.div
-                                    key={item.id} 
-                                    className="history"
-                                    whileInView={{x:0, opacity:1}}
-                                    initial={{x:100, opacity:0}}
-                                    exit={{x:-100,opacity:0}}
-                                    viewport={{once:true}}
-                                    transition={{
-                                        duration:8.8,ease:"easeOut",type:"spring",stiffness:150,damping:10
-                                    }}
-                                >
-                                    {editId === item.id ?(
-                                        <form className="editForm" >
-                                            <label htmlFor="title">Title</label>
-                                            <input
-                                            name="title"
-                                            value={editForm.title}
-                                            onChange={handleEditChange}
-                                            />
-                                            <label htmlFor="textarea">Description</label>
-                                            <textarea
-                                            name="description"
-                                            typeof="text"
-                                            value={editForm.description}
-                                            onChange={handleEditChange}
-                                            />
-                                            <label htmlFor="date">Mission End Date</label>
-                                            <input
-                                            name="date"
-                                            type="date"
-                                            value={editForm.date}
-                                            onChange={handleEditChange}
-                                            />
-                                            <button type="button" onClick={saveEdit}>Save</button>
-                                            <button type="button" onClick={cancelEdit}>Cancel</button>
-                                        </form>
-                                    ):(
-                                        <>
-                                            <h3> <span>Your Adventure:</span>  {item.title}</h3>
-                                            <p> <span>Description:</span>  {item.description}</p>
-                                            <p> <span>Wish Deadline:</span>  {item.date}</p>
-                                            <button onClick={()=>startEditing(item)}>Edit Bucket</button>
-                                            <button onClick={()=>deleteBucket(item.id)}>Delete Bucket</button>
-                                        </>
-                                    )}
-                                </motion.div>
-                            ))}
-                            
+                                .map((item)=>{
+                                const isChecked = checkedItems[item.id] || false;
+                                return(
+                                    <motion.div
+                                        key={item.id} 
+                                        className="history"
+                                        whileInView={{x:0, opacity:1}}
+                                        initial={{x:100, opacity:0}}
+                                        exit={{x:-100,opacity:0}}
+                                        viewport={{once:true}}
+                                        transition={{
+                                            duration:8.8,ease:"easeOut",type:"spring",stiffness:150,damping:10
+                                        }}
+                                    >
+                                        {editId === item.id ?(
+                                            <form className="editForm" >
+                                                <label htmlFor="title">Title</label>
+                                                <input
+                                                name="title"
+                                                value={editForm.title}
+                                                onChange={handleEditChange}
+                                                />
+                                                <label htmlFor="textarea">Description</label>
+                                                <textarea
+                                                name="description"
+                                                typeof="text"
+                                                value={editForm.description}
+                                                onChange={handleEditChange}
+                                                />
+                                                <label htmlFor="date">Mission End Date</label>
+                                                <input
+                                                name="date"
+                                                type="date"
+                                                value={editForm.date}
+                                                onChange={handleEditChange}
+                                                />
+                                                <button type="button" onClick={saveEdit}>Save</button>
+                                                <button type="button" onClick={cancelEdit}>Cancel</button>
+                                            </form>
+                                        ):(
+                                            <>
+                                                <AnimatePresence>
+                                                    {isChecked && (
+                                                    <motion.svg
+                                                        key="x-overlay"
+                                                        width="100%"
+                                                        height="100%"
+                                                        viewBox="0 0 100 100"
+                                                        style={{ position: "absolute", top: -20, left: 0, pointerEvents: "none", zIndex: 10 }}
+                                                        initial="hidden"
+                                                        animate="visible"
+                                                        exit="hidden"
+                                                    >
+                                                        <motion.path
+                                                        d="M0 0 L100 100"
+                                                        stroke="red"
+                                                        strokeWidth="4"
+                                                        strokeLinecap="round"
+                                                        variants={{
+                                                            hidden: { pathLength: 0 },
+                                                            visible: { pathLength: 1 }
+                                                        }}
+                                                        transition={{ duration: 0.4 }}
+                                                        />
+                                                        <motion.path
+                                                        d="M0 100 L100 0"
+                                                        stroke="red"
+                                                        strokeWidth="4"
+                                                        strokeLinecap="round"
+                                                        variants={{
+                                                            hidden: { pathLength: 0 },
+                                                            visible: { pathLength: 1 }
+                                                        }}
+                                                        transition={{ duration: 0.4, delay: 0.2 }}
+                                                        />
+                                                    </motion.svg>
+                                                    )}
+                                                </AnimatePresence>
+                                                <h3> <span>Your Adventure:</span>  {item.title}</h3>
+                                                <p> <span>Description:</span>  {item.description}</p>
+                                                <p> <span>Wish Deadline:</span>  {item.date}</p>
+                                                <input 
+                                                    type="checkbox"
+                                                    onChange={()=>{
+                                                        deleteHistory(item.id);
+                                                        //handleCheck(item.id);
+                                                    }}
+                                                    checked={isChecked} 
+                                                />
+                                                <p>Completed</p>
+                                                <button onClick={()=>startEditing(item)}>Edit Bucket</button>
+                                                <button onClick={()=>deleteBucket(item.id)}>Delete Bucket</button>
+                                            </>
+                                        )}
+                                    </motion.div>
+                                )
+                                })}
                         </motion.section>
                 )}
             </AnimatePresence>
+            <CompletedGoals completedGoals={completedGoals} showGoals={showGoals} setGoals={setGoals}/>
         </div>
     )
 }
@@ -902,6 +957,7 @@ const HoverAnimatedButton=({
     return(
         <>
             <motion.button
+                
                 className={className}
                 onClick={onClick}
                 onHoverStart={() => controls.start("animate")}
@@ -922,5 +978,94 @@ const HoverAnimatedButton=({
     )
 }
 
+const CompletedGoals=({completedGoals,showGoals,setGoals}:CompletedGoals)=>{
 
+    const goalRef =useRef<HTMLDivElement | null>(null)
+    
+    return(
+        <>
+            {showGoals && (
+                <section ref={goalRef} className="completedContainer">
+                    <h2>
+                    {completedGoals.length === 0
+                        ? "No Completed Goals Yet"
+                        : "Your Completed Goals"}
+                    </h2>
+
+                    {completedGoals
+                    .sort((a, b) => b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime())
+                    .map((item) => (
+                        <div key={item.id} className="completed">
+                        <h3><span>Your Adventure:</span> {item.title}</h3>
+                        <p><span>Description:</span> {item.description}</p>
+                        <p><span>Wish Deadline:</span> {item.date}</p>
+                        </div>
+                    ))}
+                </section>
+            )}
+        </>
+    )
+}
+const hoverButtonVariants:Variants ={
+    initial:{
+        opacity:0,
+        scale:0,
+        z:-20
+    },
+    animate:{
+        opacity:1,
+        scale:1,
+        z:0,
+        transition:{
+            duration:0.4,
+            ease:"easeIn",
+            type:"spring",
+            damping:10,
+            stiffness:150
+        }
+    },
+}
+
+const lineVariants:Variants={
+    initial:{rotate:0,y:0,opacity:1},
+    topHover:{rotate:35,y:18},
+    middleHover:{opacity:0},
+    bottomHover:{rotate:-35,y:-10}
+}
+const modalVariants:Variants={
+    initial:{
+        scaleY: 0,
+        opacity: 0,
+        originY: 0,
+        y: -50,
+    },
+    animate:{
+        scaleY: 1,
+        opacity: 1,
+        originY: 0,
+        y: 0,
+        transition: {
+            type: 'spring',
+            //stiffness: 150,
+            bounce:0.55,
+            //damping: 15,
+            duration: 1.8,
+            //velocity:2,
+            staggerChildren: 0.5,
+            delayChildren: 0.8
+        },
+    },
+    exit:{
+        scaleY: 0,
+        opacity: 0,
+        originY: 0,
+        y: -50,
+        transition: {
+            type: 'spring',
+            stiffness: 150,
+            damping: 10,
+            duration: 0.8,
+        },
+    }
+}
 
