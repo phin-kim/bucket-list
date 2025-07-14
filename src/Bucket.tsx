@@ -978,7 +978,7 @@ const HoverAnimatedButton=({
     )
 }
 
-const CompletedGoals=({completedGoals,showGoals,setGoals}:CompletedGoals)=>{
+const CompletedGoals=({completedGoals,showGoals}:CompletedGoals)=>{
 
     const goalRef =useRef<HTMLDivElement | null>(null)
     
