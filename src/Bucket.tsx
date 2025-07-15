@@ -64,9 +64,7 @@ function Bucket (){
         setSelectedImage(fileOrUrl)
         console.log("Selected:", fileOrUrl);
     };
-    window.addEventListener("load",()=>(
-        alert("fuck u sweetheart 😘❤")
-    ))
+    
     return(
         <>
             {profileSelector ?(
@@ -76,7 +74,6 @@ function Bucket (){
                 <>
                     <Header />
                     <BucketManager />
-                   
                 </>
             )}
         </>
@@ -413,7 +410,9 @@ const Header =()=>{
     return(
         <>
             <header>
-                <h1>Tackly </h1>
+                <h1>
+                    Tackly
+                </h1>
                 {avatar?(
                     <img className="profilePic" src={avatar} alt="" />
                 ):(
@@ -443,12 +442,12 @@ const Header =()=>{
 //add a date set later on 
 const BucketForm=({index,onSave}:BucketFormProps)=>{
     //const [inputValue,setInputValue] =useState<string>("");
-    const {bucketForms}=useAppStore();
+    const {bucketForms,deleteBucketForm}=useAppStore();
     const [formData, setFormData] = useState<BucketFormData>(
     bucketForms[index] ?? { title: "", description: "", date: "" }
     );
     const [successMessage,setSuccessMessage]=useState<boolean>(false)
-
+    const [session,setSession]=useState(false)
 
     useEffect(() => {
         setFormData(bucketForms[index] ?? { title: "", description: "", date: "" });
@@ -486,9 +485,13 @@ const BucketForm=({index,onSave}:BucketFormProps)=>{
             });
             console.log(`✅ Bucket ${index + 1} saved to Firestore`, formData);
             setSuccessMessage(true)
+            setSession(true)
 
             setTimeout(() => {
                 setSuccessMessage(false)
+                setSession(false)
+                deleteBucketForm(index);
+
             }, 4000);
         }
         catch(error){
@@ -498,11 +501,22 @@ const BucketForm=({index,onSave}:BucketFormProps)=>{
     };
     
     
+    const getBucketName = (index: number) =>index % 2 === 0 ? "Mission: Not-So-Impossible " : "Plot Twist Pending… ";
+    
     return(
         <>
-            <form className="bucketForm"
+        <AnimatePresence>
+            <motion.form 
+                className="bucketForm"
+                variants={containerVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+
             >
-                <h1 style={{fontWeight:700,marginBottom:"0.5rem"}}>Bucket {index +1}</h1>
+                <h2 style={{fontWeight:700,marginBottom:"0.5rem"}}>
+                    <BubbleText>{getBucketName(index)}</BubbleText> 
+                </h2>
                 <label htmlFor="title">Title</label>
                 <input 
                     type="text"
@@ -530,15 +544,21 @@ const BucketForm=({index,onSave}:BucketFormProps)=>{
                     onChange={handleChange}
                     
                 />
-
-                <button
+                <motion.button
                     type="button"
                     onClick={()=>handleSave()}
-                    //disabled={!inputValue.trim()}
+                    disabled={session}
+                    whileHover={{
+                        rotate:"6deg",
+                        boxShadow:"6px 6px 0px black",
+                        transition:{duration:0.4,ease:"easeInOut", type:"spring",bounce:0.65,velocity:12,mass:3}
+                    }}
                 >
-                    Save
-                </button>
-            </form>
+                    {session ? "Saving Bucket...": "Save"}
+                </motion.button>
+            </motion.form>
+        </AnimatePresence>
+           
             <AnimatePresence>
                 {successMessage &&(
                     <motion.section
@@ -791,25 +811,10 @@ const BucketManager=()=>{
             <AnimatePresence>
                 {historyContainer &&(
                         <motion.section
-                            initial={{
-                                x:20,
-                                //scale:0,
-                                opacity:0
-                            }} 
-                            animate={{
-                                x:0,
-                                //scale:1,
-                                opacity:1
-                            }}
-                            exit={{
-                                x:-20,
-                                //scale:0,
-                                opacity:0
-                            }}
-                            
-                            transition={{duration:1.5,ease:"easeIn" ,type:"spring",
-                                damping:10,stiffness:150
-                            }}
+                            variants={containerVariants}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
                             ref={historyContainerRef} 
                             className="bucketHistory" 
                             style={gridStyle}
@@ -853,8 +858,28 @@ const BucketManager=()=>{
                                                 value={editForm.date}
                                                 onChange={handleEditChange}
                                                 />
-                                                <button type="button" onClick={saveEdit}>Save</button>
-                                                <button type="button" onClick={cancelEdit}>Cancel</button>
+                                                <motion.button
+                                                whileHover={{
+                                                    rotate:"6deg",
+                                                    boxShadow:"6px 6px 0px black",
+                                                    transition:{duration:0.4,ease:"easeInOut", type:"spring",bounce:0.65,velocity:12,mass:3}
+                                                }} 
+                                                    type="button" 
+                                                    onClick={saveEdit}
+                                                >
+                                                    Save
+                                                </motion.button>
+                                                <motion.button
+                                                whileHover={{
+                                                    rotate:"6deg",
+                                                    boxShadow:"6px 6px 0px black",
+                                                    transition:{duration:0.4,ease:"easeInOut", type:"spring",bounce:0.65,velocity:12,mass:3}
+                                                }} 
+                                                    type="button" 
+                                                    onClick={cancelEdit}
+                                                >
+                                                    Cancel
+                                                </motion.button>
                                             </form>
                                         ):(
                                             <>
@@ -907,8 +932,26 @@ const BucketManager=()=>{
                                                     checked={isChecked} 
                                                 />
                                                 <p>Completed</p>
-                                                <button onClick={()=>startEditing(item)}>Edit Bucket</button>
-                                                <button onClick={()=>deleteBucket(item.id)}>Delete Bucket</button>
+                                                <motion.button 
+                                                whileHover={{
+                                                    rotate:"6deg",
+                                                    boxShadow:"6px 6px 0px black",
+                                                    transition:{duration:0.4,ease:"easeInOut", type:"spring",bounce:0.65,velocity:12,mass:3}
+                                                }}
+                                                    onClick={()=>startEditing(item)}
+                                                >
+                                                    Edit Bucket
+                                                </motion.button>
+                                                <motion.button
+                                                whileHover={{
+                                                    rotate:"6deg",
+                                                    boxShadow:"6px 6px 0px black",
+                                                    transition:{duration:0.4,ease:"easeInOut", type:"spring",bounce:0.65,velocity:12,mass:3}
+                                                }} 
+                                                onClick={()=>deleteBucket(item.id)}
+                                                >
+                                                    Delete Bucket
+                                                </motion.button>
                                             </>
                                         )}
                                     </motion.div>
@@ -1048,28 +1091,91 @@ const CompletedGoals=({completedGoals,showGoals}:CompletedGoals)=>{
     
     return(
         <>
+        <AnimatePresence>
             {showGoals && (
-                <section ref={goalRef} className="completedContainer">
-                    <h2>
-                    {completedGoals.length === 0
-                        ? "No Completed Goals Yet"
-                        : "Your Completed Goals"}
-                    </h2>
+                    <motion.section
+                        variants={containerVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                        ref={goalRef} 
+                        className="completedContainer"
+                    >
+                        <h2>
+                        {completedGoals.length === 0
+                            ? "No Completed Goals Yet"
+                            : "Your Completed Goals"}
+                        </h2>
 
-                    {completedGoals
-                    .sort((a, b) => b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime())
-                    .map((item) => (
-                        <div key={item.id} className="completed">
-                        <h3><span>Your Adventure:</span> {item.title}</h3>
-                        <p><span>Description:</span> {item.description}</p>
-                        <p><span>Wish Deadline:</span> {item.date}</p>
-                        </div>
-                    ))}
-                </section>
+                        {completedGoals
+                        .sort((a, b) => b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime())
+                        .map((item) => (
+                            <div key={item.id} className="completed">
+                            <h3><span>Your Adventure:</span> {item.title}</h3>
+                            <p><span>Description:</span> {item.description}</p>
+                            <p><span>Wish Deadline:</span> {item.date}</p>
+                            </div>
+                        ))}
+                    </motion.section>
             )}
+        </AnimatePresence>
         </>
     )
 }
+
+const BubbleText = ({ children }: { children: string }) => {
+    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+    return (
+        <p
+        style={{
+            //textAlign: "center",
+            fontSize: "3rem",
+            fontWeight: 100,
+            color: "rgb(165, 180, 252)",
+        }}
+        >
+        {children.split("").map((char, index) => {
+            const isHovered = index === hoveredIndex;
+            const isNeighbor =index === hoveredIndex! - 1 || index === hoveredIndex! + 1;
+
+            let scale = 1;
+            let color = "rgb(196, 167, 242)"; // base soft purple (was indigo-300)
+
+            if (isHovered) {
+            scale = 1.3;
+            color = "rgb(243, 232, 255)"; // light lavender glow (was almost-white)
+            } else if (isNeighbor) {
+            scale = 1.1;
+            color = "rgb(216, 180, 254)"; // mid lavender (was light indigo)
+            }
+
+            return (
+            <motion.span
+                key={index}
+                style={{
+                display: "inline-block",
+                marginRight: "1px",
+                color,
+                cursor: "default",
+                }}
+                animate={{ scale, color }}
+                transition={{ type: "spring",bounce:0.65,mass:4,ease:"easeIn",velocity:10}}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                onTapStart={() => setHoveredIndex(index)}
+                onTapCancel={() => setHoveredIndex(null)}
+            >
+                {char}
+            </motion.span>
+            );
+        })}
+        </p>
+    );
+};
+
+
+
 const hoverButtonVariants:Variants ={
     initial:{
         opacity:0,
@@ -1088,6 +1194,24 @@ const hoverButtonVariants:Variants ={
             stiffness:150
         }
     },
+}
+const containerVariants:Variants={
+    initial:{
+        x:70,
+        opacity:0
+    }, 
+    animate:{
+        x:0,
+        opacity:1,
+        transition:{
+            duration:1.5,ease:"easeIn" ,type:"spring",bounce:0.55
+        }
+    },
+    exit:{
+        x:-70,
+        opacity:0
+    },
+    
 }
 const lineVariants:Variants={
     initial:{rotate:0,y:0,opacity:1},
@@ -1108,7 +1232,7 @@ const modalVariants:Variants={
         originY: 0,
         y: 0,
         transition: {
-            type: 'spring',
+            type: 'spring', 
             //stiffness: 150,
             bounce:0.55,
             //damping: 15,

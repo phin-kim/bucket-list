@@ -324,6 +324,7 @@ header .avatarPlaceholder h2 {
   font-size: 2rem;
   font-weight: 600;
   z-index: 12;
+  transform: scale(1);
   border-radius: 12px;
   background: linear-gradient(135deg, #ef7903 40%, #824100 80%, #512d02 100%);
   color: #c8c8c8;
@@ -586,4 +587,25 @@ header .avatarPlaceholder h2 {
 }
 .completedContainer .completed p :last-of-type {
   display: inline-block;
+}
+
+/* DatePicker Input Styles */
+/* styles.css */
+.rdp {
+  --rdp-accent-color: rebeccapurple;
+  --rdp-background-color: #f8f5ff;
+  --rdp-outline: 2px solid rebeccapurple;
+  font-family: "Segoe UI", sans-serif;
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.rdp-day_selected {
+  background-color: rebeccapurple;
+  color: white;
+  font-weight: bold;
+}
+
+.rdp-day_today {
+  border: 1px solid rebeccapurple;
 }/*# sourceMappingURL=Bucket.css.map */

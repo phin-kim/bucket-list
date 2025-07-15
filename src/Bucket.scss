@@ -25,6 +25,7 @@ $col: #c8c8c8;
     font-size: 2rem;
     font-weight: 600;
     z-index: 12;
+    transform: scale(1);
     border-radius: $pix;
     background: linear-gradient(135deg, #ef7903 40%, #824100 80%, #512d02 100%);
     color: $col;
@@ -471,10 +472,31 @@ header {
     font-size: 1.5rem;
     font-family: $font;
 }
+
 .completedContainer{
     @include historyGoalStyles;
     .completed{
         position: $rel;
         @include historyStyles;
     }
+}
+/* DatePicker Input Styles */
+/* styles.css */
+.rdp {
+  --rdp-accent-color: rebeccapurple;
+  --rdp-background-color: #f8f5ff;
+  --rdp-outline: 2px solid rebeccapurple;
+  font-family: 'Segoe UI', sans-serif;
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.rdp-day_selected {
+  background-color: rebeccapurple;
+  color: white;
+  font-weight: bold;
+}
+
+.rdp-day_today {
+  border: 1px solid rebeccapurple;
 }

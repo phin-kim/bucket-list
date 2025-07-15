@@ -53,6 +53,8 @@ interface AppState {
     updateBucketForm: (index: number, data: BucketFormData) => void;
     addBucketForm: () => void;
     deleteBucketForm:(index:number)=>void;
+
+    
 }
 
 
