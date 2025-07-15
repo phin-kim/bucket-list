@@ -114,42 +114,7 @@ export const useAppStore = create<AppState>((set,get) => {
         deleteBucketForm:(index)=>set((state)=>({
             bucketForms:state.bucketForms.filter((_,i)=>i !==index)
         })),
-        handleGoogleLogIn: async () => {
-            set({ error: "" }); // clear errors before attempting
-            const popup = window.open("", "_blank");
-            if (!popup) {
-            alert("Popup blocked! Please allow popups for this site.");
-            }
-            try {
-            await signInWithPopup(auth, googleProvider);
-            //navigate("/dashboard")
-            } catch (err) {
-                const error = err as FirebaseError;
-                let message = "Something went wrong.Try again";
-                if (error.code) {
-                    switch (error.code) {
-                    case "auth/popup-closed-by-user":
-                        message = "The popup was closed before completing the sign-in.";
-                        break;
-                    case "auth/network-request-failed":
-                        message = "Network error. Check your internet connection.";
-                        break;
-                    case "auth/cancelled-popup-request":
-                        message = "Popup request was cancelled.";
-                        break;
-                    case "auth/popup-blocked":
-                        message = "Popup was blocked by the browser.";
-                        break;
-                    case "auth/user-disabled":
-                        message = "This user has been disabled.";
-                        break;
-                    default:
-                        message = `Error: ${error.message}`;
-                    }
-                }
-            setTimedError(message);
-            }
-        },
+        
         handleEmailLogin: async () => {
         const {email,password,} =get()
         set ({ error: "" });
@@ -239,6 +204,38 @@ export const useAppStore = create<AppState>((set,get) => {
                 }
                 setTimedError(message);
                 return "fail"
+            }
+        },
+        handleGoogleLogIn: async () => {
+            set({ error: "" }); // clear errors before attempting
+            try {
+                await signInWithPopup(auth, googleProvider);
+                //navigate("/dashboard")
+            } catch (err) {
+                const error = err as FirebaseError;
+                let message = "Something went wrong. Try again";
+                if (error.code) {
+                    switch (error.code) {
+                        case "auth/popup-closed-by-user":
+                            message = "The popup was closed before completing the sign-in.";
+                            break;
+                        case "auth/network-request-failed":
+                            message = "Network error. Check your internet connection.";
+                            break;
+                        case "auth/cancelled-popup-request":
+                            message = "Popup request was cancelled.";
+                            break;
+                        case "auth/popup-blocked":
+                            message = "Popup was blocked by the browser.";
+                            break;
+                        case "auth/user-disabled":
+                            message = "This user has been disabled.";
+                            break;
+                        default:
+                            message = `Error: ${error.message}`;
+                    }
+                }
+                setTimedError(message);
             }
         },
     }
