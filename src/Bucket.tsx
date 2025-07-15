@@ -1,11 +1,11 @@
 import React, { useState,useRef, useEffect, } from "react";
-import type { ReactNode } from "react";
+import type { ReactNode,  } from "react";
 //import { useNavigate } from "react-router-dom";
 import  { useAppStore } from "./states";
 import type { BucketFormData } from "./states";
 import type { User } from "firebase/auth";
 import { db } from "../firebase";
-import { collection,doc, addDoc, where,getDocs,query, Timestamp, deleteDoc,updateDoc } from "firebase/firestore";
+import { collection,doc, addDoc, where,getDocs,query, Timestamp, deleteDoc,updateDoc, serverTimestamp } from "firebase/firestore";
 import {
     onAuthStateChanged,
     getAuth,
@@ -47,7 +47,16 @@ interface CompletedGoals{
     showGoals:boolean,
     setGoals:(value: boolean)=>void
 }
+//updater functions have a different type
+type NavProps={
+    showButtons:boolean,
+    setShowButtons:React.Dispatch<React.SetStateAction<boolean>>,
+    setGoals:React.Dispatch<React.SetStateAction<boolean>>,
+    loadBuckets:()=>void,
+    loadGoals:()=>void,
+    currentUser: User | null
 
+}
 function Bucket (){
     const {setSelectedImage,profileSelector} =useAppStore()
     // Handler for ProfilePicselector
@@ -358,6 +367,11 @@ const Header =()=>{
     const [index,setIndex] =useState<number>(0);
     const images =[
         {
+            src:"/hero4.webp",
+            alt:"Forest path",
+        },
+        
+        /*{
             src:"/hero1.webp",
             alt:"Mountaini view",
         },
@@ -365,18 +379,15 @@ const Header =()=>{
             src:"/hero2.webp",
             alt:"City skyline",
         },
+        
         {
             src:"/hero3.webp",
             alt:"Beach sunset",
         },
         {
-            src:"/hero4.webp",
-            alt:"Forest path",
-        },
-        {
             src:"/hero5.webp",
             alt:"Desert dunes",
-        },
+        },*/
     ]
     useEffect(() => {
         const END_ANIMATION = 5 * 60 * 1000; // 5 minutes
@@ -558,24 +569,21 @@ const BucketManager=()=>{
     const {
         bucketForms,
         addBucketForm,
-        setProfileSelector,
         updateBucketForm,
-        //deleteBucketForm,
     }=useAppStore();
-    //const [buckets,setBuckets] = useState<number[]>([1]);
     const [showButtons,setShowButtons] = useState<boolean>(false);
-    //const [checkingSession, setCheckingSession] = useState(true);
     const [history,setHistory] =useState<BucketData[]>([])
-    const[historyContainer,setHistoryContainer]=useState<boolean>(false)
+    const [historyContainer,setHistoryContainer]=useState<boolean>(false)
     const [currentUser, setCurrentUser] = useState<User | null>(null);
-    //const [successMessage,setSuccessMessage]=useState<boolean>(false)
     const [editId,setEditId] =useState<string | null >(null)
     const [editForm,setEditForm]=useState({
         title:"",
         description:"",
         date:"",
     })
-    
+    const [checkedItems,setIsChecked]= useState<{[id:string]:boolean}>({})
+    const [completedGoals,setCompleted]=useState<BucketData[]>([])
+    const [showGoals,setGoals] =useState<boolean>(false) 
     const handleSave=(index:number,value:BucketFormData)=>{
         
         const isFomValid = value.title.trim() && value.description.trim() && value.date.trim();
@@ -593,10 +601,10 @@ const BucketManager=()=>{
 
     const buttonContainerRef=useRef<HTMLDivElement | null>(null)
     const historyContainerRef =useRef<HTMLElement | null> (null)
-    const handleButtons =(e:React.MouseEvent)=>{
-        e.stopPropagation()
-        setShowButtons(prev =>!prev);
-    }
+    //const handleButtons =(e:React.MouseEvent)=>{
+    //    e.stopPropagation()
+    //    setShowButtons(prev =>!prev);
+    //}
     const handleHistory=()=>{
         setHistoryContainer(prev=>!prev)
     }
@@ -703,19 +711,59 @@ const BucketManager=()=>{
         gridTemplateRows:`repeat(${length},1fr)`,
         gap:"10px"
     }
+    const saveGoals=async(goalToSave:BucketData)=>{
+        //if(completedGoals.length <= 0)return;
+        const user  =getAuth().currentUser;
+            if(!user){
+                alert("Please Log In or Sign In to save buckets")
+                return;
+        }
+        //const goalToSave =completedGoals.find(item => item.id ===id);
+        //if(!goalToSave) return;
+        console.log("🧠 Saving this goal:", goalToSave);
 
-    const [hovered,setHovered] =useState<boolean>(false)
-    const [checkedItems,setIsChecked]= useState<{[id:string]:boolean}>({})
-    const [completedGoals,setCompleted]=useState<BucketData[]>([])
-    const [showGoals,setGoals] =useState<boolean>(false) 
-   
+        try{
+            const ref = collection(db,"completedGoals")
+            console.log("🔍collection ref",ref)
+            await addDoc(ref,{
+                uid:user.uid,
+                ...goalToSave,
+                savedAt:serverTimestamp(),
+            });
+            console.log("✅ Goal saved to completedGoals:", goalToSave.title);
+        }
+        catch(err){
+            console.log("❌Couldn't saver completed goals",err as FirebaseError)
+        }
+    }
+    const loadGoals=async()=>{
+        const user =getAuth().currentUser;
+        if(!user) return;
+        const goal = query(collection(db,"completedGoals"),where("uid","==",user.uid))
+        const goalSnapShot =await getDocs(goal);
+        const goalData:BucketData[]=goalSnapShot.docs.map(doc=>({
+            id:doc.id,
+            ...doc.data() as BucketDetails
+        }));
+        console.log("Loaded goals",goalData)
 
+        setCompleted(goalData)
+
+    }
     const deleteHistory=(id:string)=>{
         if(!id) return;
         setIsChecked(prev => ({ ...prev, [id]: true }));
         setTimeout(() => {
+            //filter matching item
             const complete = history.filter(item => item.id === id);
-            setCompleted(prev => [...prev, ...complete]);
+            //update the state
+            const goalToSave=complete[0];
+            //setCompleted(prev => [...prev, ...complete]);
+            //save to firestore
+            saveGoals(goalToSave);
+            //deltet from the history collection
+            deleteBucket(id)
+            //remove from the ui
             setHistory(history.filter(item => item.id !== id));
 
             // Clean up checkedItems
@@ -726,9 +774,7 @@ const BucketManager=()=>{
             });
         }, 800);
     }
-    const handleGoals=()=>{
-        setGoals(prev=> !prev)
-    }
+    
     return(
         <div>
             {bucketForms.map((_,index)=>(
@@ -740,85 +786,7 @@ const BucketManager=()=>{
             ))}
             
             <div ref={buttonContainerRef}>
-                {showButtons ?(
-                    <motion.section
-                        variants={modalVariants}
-                        initial="initial"
-                        animate="animate"
-                        exit="initial"
-                        className="bucketControlButtons"
-                    >
-                        <HoverAnimatedButton
-                            icon={<AiOutlinePlusCircle size={50}  />}
-                            text="Add a New Bucket Item"
-                            className="addButton"
-                            onClick={addBucketForm}
-                            //controls={controls}
-                            variants={hoverButtonVariants}
-                        />
-
-                        <HoverAnimatedButton
-                            icon={<GiEmptyWoodBucketHandle size={50}  />}
-                            text="Load your Bucket History"
-                            className="loadButton"
-                            onClick={()=>
-                                loadBuckets()
-                            }
-                            //controls={controls}
-                            variants={hoverButtonVariants}
-                        />
-
-                        <HoverAnimatedButton
-                            icon={<GiDiamondTrophy size={50} />}
-                            text="View Your Achieved Goals"
-                            className="logIn"
-                            onClick={handleGoals}
-                            //controls={controls}
-                            variants={hoverButtonVariants}
-                        />
-                        <HoverAnimatedButton
-                            icon={<IoMdPersonAdd size={50} />}
-                            text="Create Your Account"
-                            className="createAccount"
-                            onClick={() => setProfileSelector(true)}
-                            //controls={controls}
-                            variants={hoverButtonVariants}
-                        />
-                    </motion.section>
-                    
-
-                ):(
-                    <motion.div
-                        onHoverStart={()=>setHovered(true)}
-                        onHoverEnd={()=>setHovered(false)}
-                        onTapStart={()=>setHovered(true)}
-                        onTap={()=>setHovered(false)}
-                        onClick={handleButtons}
-                        className="showButtons"
-                    >
-                        <motion.span
-                            variants={lineVariants}
-                            initial="initial"
-                            animate={hovered? "topHover":"initial"}
-                        />
-                        <motion.span
-                            variants={lineVariants}
-                            initial="initial"
-                            animate={hovered?"middleHover":"initial"}
-                        />
-                        <motion.span
-                            initial="initial"
-                            variants={lineVariants}
-                            animate={hovered? "bottomHover":"initial"}
-                            
-                        />
-                        {/*<IoMdMenu size={80} className="showButtons" onClick={handleButtons}/>*/}
-                    </motion.div>
-                    
-                )}
-                {!currentUser &&(
-                    <p></p>
-                )}
+                <Nav showButtons={showButtons} setShowButtons={setShowButtons} setGoals={setGoals} loadBuckets={loadBuckets} currentUser={currentUser} loadGoals={loadGoals} />
             </div>
             <AnimatePresence>
                 {historyContainer &&(
@@ -980,7 +948,100 @@ const HoverAnimatedButton=({
         </>
     )
 }
+const Nav=({showButtons,setShowButtons,setGoals,loadBuckets,currentUser,loadGoals}:NavProps)=>{
+    const {setProfileSelector,addBucketForm}=useAppStore()
+    const [hovered,setHovered] =useState<boolean>(false)
+    const handleGoals=()=>{
+        setGoals(prev=> !prev)
+    }
+    const handleButtons =(e:React.MouseEvent)=>{
+        e.stopPropagation()
+        setShowButtons(prev =>!prev);
+    }
+    return(
+        <>
+            {showButtons ?(
+                    <motion.section
+                        variants={modalVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="initial"
+                        className="bucketControlButtons"
+                    >
+                        <HoverAnimatedButton
+                            icon={<AiOutlinePlusCircle size={70}  />}
+                            text="Add a New Bucket Item"
+                            className="addButton"
+                            onClick={addBucketForm}
+                            //controls={controls}
+                            variants={hoverButtonVariants}
+                        />
 
+                        <HoverAnimatedButton
+                            icon={<GiEmptyWoodBucketHandle size={70}  />}
+                            text="Load your Bucket History"
+                            className="loadButton"
+                            onClick={()=>
+                                loadBuckets()
+                            }
+                            //controls={controls}
+                            variants={hoverButtonVariants}
+                        />
+
+                        <HoverAnimatedButton
+                            icon={<GiDiamondTrophy size={70} />}
+                            text="View Your Achieved Goals"
+                            className="logIn"
+                            onClick={()=>{
+                                loadGoals();
+                                handleGoals();
+                            }}
+                            //controls={controls}
+                            variants={hoverButtonVariants}
+                        />
+                        <HoverAnimatedButton
+                            icon={<IoMdPersonAdd size={70} />}
+                            text="Create Your Account"
+                            className="createAccount"
+                            onClick={() => setProfileSelector(true)}
+                            //controls={controls}
+                            variants={hoverButtonVariants}
+                        />
+                    </motion.section>
+                ):(
+                    <motion.div
+                        onHoverStart={()=>setHovered(true)}
+                        onHoverEnd={()=>setHovered(false)}
+                        onTapStart={()=>setHovered(true)}
+                        onTap={()=>setHovered(false)}
+                        onClick={handleButtons}
+                        className="showButtons"
+                    >
+                        <motion.span
+                            variants={lineVariants}
+                            initial="initial"
+                            animate={hovered? "topHover":"initial"}
+                        />
+                        <motion.span
+                            variants={lineVariants}
+                            initial="initial"
+                            animate={hovered?"middleHover":"initial"}
+                        />
+                        <motion.span
+                            initial="initial"
+                            variants={lineVariants}
+                            animate={hovered? "bottomHover":"initial"}
+                            
+                        />
+                        {/*<IoMdMenu size={80} className="showButtons" onClick={handleButtons}/>*/}
+                    </motion.div>
+                )}
+            {!currentUser &&(
+                <p></p>
+            )}
+        </>
+    )
+}
 const CompletedGoals=({completedGoals,showGoals}:CompletedGoals)=>{
 
     const goalRef =useRef<HTMLDivElement | null>(null)
@@ -1028,7 +1089,6 @@ const hoverButtonVariants:Variants ={
         }
     },
 }
-
 const lineVariants:Variants={
     initial:{rotate:0,y:0,opacity:1},
     topHover:{rotate:35,y:18},

@@ -188,7 +188,7 @@ body {
         grid-template-rows: repeat(3, 1fr);
         position: $abs;
         top: 12em;
-        left: 30%;
+        left: 28%;
         align-items: center;
         justify-content: center;
         gap: 10px;
@@ -353,10 +353,10 @@ header {
     background: $back;
     backdrop-filter: $filt;
     position: fixed;
-    height: 20em;
-    width: 3.5em;
+    height: 27em;
+    width: 6.5em;
     top: 10em;
-    left: 90%;
+    left: 78%;
     transform: translateX(-50%);
     //display: flex;
     //flex-direction: row;
@@ -372,12 +372,14 @@ header {
     button {
         @include toggleButton;
         @include bucketButton;
+        height: 3em;
+        width: 3em;
     }
     span {
         background: white;
         position: $abs;
         text-align: $cent;
-        right: 5em;
+        right: 7em;
         width: 10em;
         font-family: $font;
         font-size: 1.5rem;
@@ -395,16 +397,16 @@ header {
             border-color: transparent transparent transparent #fff;
         }
         &:first-of-type {
-            top: 0.5em;
+            top: 0.9em;
         }
         &:nth-of-type(2) {
-            top: 4.2em;
+            top: 5.3em;
         }
         &:nth-of-type(3) {
-            top: 7.8em;
+            top: 10.2em;
         }
         &:nth-of-type(4) {
-            top: 11.2em;
+            top: 14.7em;
         }
     }
 }
@@ -443,10 +445,10 @@ header {
     flex-direction: column;
     justify-content: space-between;
     cursor: pointer;
-    z-index: 4;
+    z-index: 10;
     top: 10em;
     padding: 1rem;
-    left: 80%;
+    left: 78%;
     background: #440880;
     border-radius: 12px;
     span {

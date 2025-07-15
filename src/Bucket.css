@@ -53,7 +53,7 @@ body {
   grid-template-rows: repeat(3, 1fr);
   position: absolute;
   top: 12em;
-  left: 30%;
+  left: 28%;
   align-items: center;
   justify-content: center;
   gap: 10px;
@@ -294,10 +294,10 @@ header .avatarPlaceholder h2 {
   -webkit-backdrop-filter: blur(4px);
           backdrop-filter: blur(4px);
   position: fixed;
-  height: 20em;
-  width: 3.5em;
+  height: 27em;
+  width: 6.5em;
   top: 10em;
-  left: 90%;
+  left: 78%;
   transform: translateX(-50%);
   display: grid;
   grid-template-rows: repeat(4, 1fr);
@@ -327,12 +327,14 @@ header .avatarPlaceholder h2 {
   border-radius: 12px;
   background: linear-gradient(135deg, #ef7903 40%, #824100 80%, #512d02 100%);
   color: #c8c8c8;
+  height: 3em;
+  width: 3em;
 }
 .bucketControlButtons span {
   background: white;
   position: absolute;
   text-align: center;
-  right: 5em;
+  right: 7em;
   width: 10em;
   font-family: "Caveat Brush", cursive;
   font-size: 1.5rem;
@@ -351,16 +353,16 @@ header .avatarPlaceholder h2 {
   border-color: transparent transparent transparent #fff;
 }
 .bucketControlButtons span:first-of-type {
-  top: 0.5em;
+  top: 0.9em;
 }
 .bucketControlButtons span:nth-of-type(2) {
-  top: 4.2em;
+  top: 5.3em;
 }
 .bucketControlButtons span:nth-of-type(3) {
-  top: 7.8em;
+  top: 10.2em;
 }
 .bucketControlButtons span:nth-of-type(4) {
-  top: 11.2em;
+  top: 14.7em;
 }
 
 .bucketHistory {
@@ -504,10 +506,10 @@ header .avatarPlaceholder h2 {
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
-  z-index: 4;
+  z-index: 10;
   top: 10em;
   padding: 1rem;
-  left: 80%;
+  left: 78%;
   background: #440880;
   border-radius: 12px;
 }
