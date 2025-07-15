@@ -1,69 +1,89 @@
-# React + TypeScript + Vite
+# Tackly: The Bucket List App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Tackly ("my-bucket") is a modern, interactive bucket list app built with React, TypeScript, Vite, Firebase, Zustand, and Framer Motion. It helps you set, track, and celebrate your life goals and adventures in a fun, visual way.
 
-Currently, two official plugins are available:
+## 🚀 Project Overview
+- **Create, edit, and delete bucket list items** with titles, descriptions, and target dates.
+- **User authentication** via email/password or Google sign-in.
+- **Profile customization** with avatar selection or image upload.
+- **Save and revisit your completed goals** ("achievements").
+- **Animated, responsive UI** with Framer Motion.
+- **Persistent storage** using Firebase Firestore.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Features
+- Add, update, and remove bucket list entries
+- Mark goals as completed and view your achievements
+- Secure authentication (Google or email/password)
+- Customizable profile with avatar or uploaded image
+- Animated transitions and interactive UI
+- Mobile-friendly and responsive design
 
-## Expanding the ESLint configuration
+## 🎬 Demo
+*Coming soon!*
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🛠️ Getting Started
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Prerequisites
+- Node.js (v18+ recommended)
+- npm or yarn
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### Installation
+```bash
+# Clone the repo
+ git clone <your-repo-url>
+ cd my-bucket
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Install dependencies
+ npm install
+# or
+yarn install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Running Locally
+```bash
+# Start the development server
+npm run dev
+# or
+yarn dev
 ```
+Visit [http://localhost:5173](http://localhost:5173) to view the app.
+
+### Building for Production
+```bash
+npm run build
+# or
+yarn build
+```
+
+### Linting
+```bash
+npm run lint
+# or
+yarn lint
+```
+
+## 📂 Folder Structure
+```
+my-bucket/
+  ├── public/           # Static assets (avatars, images, etc.)
+  ├── src/              # Source code
+  │   ├── App.tsx       # App entry point
+  │   ├── Bucket.tsx    # Main bucket list logic/UI
+  │   ├── states.ts     # Zustand global state
+  │   ├── firebase.ts   # Firebase config
+  │   └── ...           # Other components/assets
+  ├── package.json      # Project metadata & scripts
+  ├── vite.config.ts    # Vite config
+  └── ...
+```
+
+## 🧰 Technologies Used
+- [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/) (build tool)
+- [Firebase](https://firebase.google.com/) (Auth & Firestore)
+- [Zustand](https://zustand-demo.pmnd.rs/) (state management)
+- [Framer Motion](https://www.framer.com/motion/) (animations)
+- [React Icons](https://react-icons.github.io/react-icons/)
+
+## 📜 License
+MIT
