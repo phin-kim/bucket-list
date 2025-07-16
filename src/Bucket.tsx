@@ -166,7 +166,7 @@ const ProfilePicselector = ({onSelect}: ProfileProps)=>{
                 >
                     {defaultAvatars.map((src)=>(
                         <button
-                        className="defaultAvatarButton"
+                            className="defaultAvatarButton"
                             key={src}
                             onClick={()=> handleAvatarClick(src)}
                         >
@@ -185,14 +185,24 @@ const ProfilePicselector = ({onSelect}: ProfileProps)=>{
             
             {/*Upload */}
             <div className="toggleButtons">
-                <button
+                <motion.button
+                    whileTap={{
+                        scale:0.55,
+                        transition:{duration:0.2,ease:"easeInOut",type:"spring",stiffness:150,damping:10}
+                    }}
                     className="avatarButton"
                     onClick={()=>{
                         setShowGrid(prev =>!prev)
                     }}
-                >{showGrid ? "Fill Form":"Choose Avatar"}</button>
-                <label
-                className="choseFile"
+                >
+                    {showGrid ? "Fill Form":"Choose Avatar"}
+                </motion.button>
+                <motion.label
+                whileTap={{
+                    scale:0.55,
+                    transition:{duration:0.2,ease:"easeInOut",type:"spring",stiffness:150,damping:10}
+                }}
+                    className="choseFile"
                 >
                     Upload Your Pic
                     <input
@@ -201,11 +211,15 @@ const ProfilePicselector = ({onSelect}: ProfileProps)=>{
                         accept="image/*"
                         onChange={handleFileChange}
                     />
-                </label>
-                <button
+                </motion.label>
+                <motion.button
+                    whileTap={{
+                        scale:0.55,
+                        transition:{duration:0.2,ease:"easeInOut",type:"spring",stiffness:150,damping:10}
+                    }}
                     className="googleSignIn" onClick={handleGoogle}>
                     Google Sign In
-                </button>
+                </motion.button>
                 <span className="errorMessage">{error}</span>
                 
             </div>
@@ -329,9 +343,17 @@ const Form: React.FC = ()=>{
                         required
                     />
                 </label>
-                <button type="submit" disabled={loading} >
+                <motion.button
+                whileHover={{
+                    rotate:"6deg",
+                    boxShadow:"6px 6px 0px black",
+                    transition:{duration:0.4,ease:"easeInOut", type:"spring",bounce:0.65,velocity:12,mass:3}
+                }} 
+                    type="submit" 
+                    disabled={loading} 
+                >
                     {loading ? "Saving..." : "Save Details"}
-                </button>
+                </motion.button>
                 
                 </form>
         </>
@@ -358,8 +380,16 @@ const Header =()=>{
         setAvatar(avatar || "");
 
     }
-    getName()
-        window.addEventListener("DOMContentLoaded",getName);
+    //getName()
+    useEffect(() => {
+        const unsubscribe = getAuth().onAuthStateChanged((user) => {
+            if (user) {
+                getName();
+            }
+        });
+        return () => unsubscribe();
+    }, []);
+    
     const initial = nickname ? nickname.charAt(0).toUpperCase() : "?";
     const [index,setIndex] =useState<number>(0);
     const images =[
@@ -804,11 +834,11 @@ const BucketManager=()=>{
                     onSave={handleSave} 
                 />
             ))}
+            <AnimatePresence>
             
             <div ref={buttonContainerRef}>
                 <Nav showButtons={showButtons} setShowButtons={setShowButtons} setGoals={setGoals} loadBuckets={loadBuckets} currentUser={currentUser} loadGoals={loadGoals} />
             </div>
-            <AnimatePresence>
                 {historyContainer &&(
                         <motion.section
                             variants={containerVariants}
@@ -968,16 +998,26 @@ const HoverAnimatedButton=({
     onClick,icon,text,className,variants
 }:HoverAnimateButtonsProps)=>{
     const controls = useAnimationControls();
+    const mounted = useRef(false);
+    useEffect(() => {
+        mounted.current = true;
+        return () => { mounted.current = false; };
+    }, []);
+
+    const safeStart = (state: string) => {
+        if (mounted.current) {
+        controls.start(state);
+        }
+    };
     return(
         <>
             <motion.button
-                
                 className={className}
                 onClick={onClick}
-                onHoverStart={() => controls.start("animate")}
-                onHoverEnd={() => controls.start("initial")}
-                onTapStart={()=>controls.start("animate")}
-                onTap={()=>controls.start("initial")}
+                onHoverStart={() => safeStart("animate")}
+                onHoverEnd={() => safeStart("initial")}
+                onTapStart={() => safeStart("animate")}
+                onTap={() => safeStart("initial")}
             >
                 {icon}
             </motion.button>
@@ -1008,7 +1048,7 @@ const Nav=({showButtons,setShowButtons,setGoals,loadBuckets,currentUser,loadGoal
                         variants={modalVariants}
                         initial="initial"
                         animate="animate"
-                        exit="initial"
+                        exit="exit"
                         className="bucketControlButtons"
                     >
                         <HoverAnimatedButton
@@ -1110,7 +1150,7 @@ const CompletedGoals=({completedGoals,showGoals}:CompletedGoals)=>{
                         {completedGoals
                         .sort((a, b) => b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime())
                         .map((item) => (
-                            <div key={item.id} className="completed">
+                            <div key={item.id + 1} className="completed">
                             <h3><span>Your Adventure:</span> {item.title}</h3>
                             <p><span>Description:</span> {item.description}</p>
                             <p><span>Wish Deadline:</span> {item.date}</p>
