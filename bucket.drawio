@@ -1,10 +1,10 @@
 <mxfile host="65bd71144e">
     <diagram id="G1Y3DMBo6kmLxro5RJhm" name="Page-1">
-        <mxGraphModel dx="1242" dy="1571" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="476" dy="1467" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="2" value="" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                <mxCell id="2" value="" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1" parent="1" vertex="1">
                     <mxGeometry x="10" y="-610" width="820" height="980" as="geometry"/>
                 </mxCell>
                 <mxCell id="3" value="&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;THE NAME OF THE APP" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
@@ -13,7 +13,7 @@
                 <mxCell id="4" value="" style="image;html=1;image=img/lib/clip_art/people/Suit_Man_Green_Black_128x128.png" parent="1" vertex="1">
                     <mxGeometry x="710" y="-400" width="80" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="5" value="" style="image;html=1;image=img/lib/clip_art/people/Suit_Woman_Green_128x128.png" parent="1" vertex="1">
+                <mxCell id="5" value="" style="image;html=1;image=img/lib/clip_art/people/Suit_Woman_Green_128x128.png;fontStyle=1" parent="1" vertex="1">
                     <mxGeometry x="110" y="-400" width="80" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="7" value="image showing adventure" style="html=1;shadow=0;dashed=0;shape=mxgraph.bootstrap.rrect;rSize=5;strokeColor=#DFDFDF;html=1;whiteSpace=wrap;fillColor=#ffffff;fontColor=#000000;verticalAlign=bottom;align=left;spacing=20;fontSize=14;" parent="1" vertex="1">
@@ -252,16 +252,16 @@
                 <mxCell id="31" value="eneable the authenticate with google and add a remeber me to prevent signinig in every time eneble multifactor authentication as the project progresses" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="20" y="690" width="190" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="66" value="authorization process" style="swimlane;startSize=20;horizontal=1;childLayout=flowLayout;flowOrientation=north;resizable=0;interRankCellSpacing=50;containerType=tree;fontSize=12;" vertex="1" parent="1">
+                <mxCell id="66" value="authorization process" style="swimlane;startSize=20;horizontal=1;childLayout=flowLayout;flowOrientation=north;resizable=0;interRankCellSpacing=50;containerType=tree;fontSize=12;" parent="1" vertex="1">
                     <mxGeometry x="455" y="1800" width="140" height="460" as="geometry"/>
                 </mxCell>
-                <mxCell id="67" value="user creates an account&amp;nbsp;" style="whiteSpace=wrap;html=1;" vertex="1" parent="66">
+                <mxCell id="67" value="user creates an account&amp;nbsp;" style="whiteSpace=wrap;html=1;" parent="66" vertex="1">
                     <mxGeometry x="20" y="40" width="100" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="68" value="page unloads" style="whiteSpace=wrap;html=1;" vertex="1" parent="66">
+                <mxCell id="68" value="page unloads" style="whiteSpace=wrap;html=1;" parent="66" vertex="1">
                     <mxGeometry x="20" y="130" width="100" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="69" value="" style="html=1;rounded=1;curved=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startSize=6;endSize=6;noEdgeStyle=1;orthogonal=1;" edge="1" parent="66" source="67" target="68">
+                <mxCell id="69" value="" style="html=1;rounded=1;curved=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startSize=6;endSize=6;noEdgeStyle=1;orthogonal=1;" parent="66" source="67" target="68" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
                             <mxPoint x="70" y="92"/>
@@ -269,7 +269,7 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="75" value="" style="html=1;rounded=1;curved=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startSize=6;endSize=6;noEdgeStyle=1;orthogonal=1;" edge="1" target="76" source="68" parent="66">
+                <mxCell id="75" value="" style="html=1;rounded=1;curved=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startSize=6;endSize=6;noEdgeStyle=1;orthogonal=1;" parent="66" source="68" target="76" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="705" y="2240" as="sourcePoint"/>
                         <Array as="points">
@@ -278,10 +278,10 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="76" value="is use loggedd in" style="whiteSpace=wrap;html=1;" vertex="1" parent="66">
+                <mxCell id="76" value="is use loggedd in" style="whiteSpace=wrap;html=1;" parent="66" vertex="1">
                     <mxGeometry x="20" y="220" width="100" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="80" value="" style="html=1;rounded=1;curved=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startSize=6;endSize=6;noEdgeStyle=1;orthogonal=1;" edge="1" target="81" source="76" parent="66">
+                <mxCell id="80" value="" style="html=1;rounded=1;curved=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startSize=6;endSize=6;noEdgeStyle=1;orthogonal=1;" parent="66" source="76" target="81" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="585" y="2090" as="sourcePoint"/>
                         <Array as="points">
@@ -290,10 +290,10 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="81" value="true" style="whiteSpace=wrap;html=1;" vertex="1" parent="66">
+                <mxCell id="81" value="true" style="whiteSpace=wrap;html=1;" parent="66" vertex="1">
                     <mxGeometry x="20" y="310" width="100" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="82" value="" style="html=1;rounded=1;curved=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startSize=6;endSize=6;noEdgeStyle=1;orthogonal=1;" edge="1" target="83" source="81" parent="66">
+                <mxCell id="82" value="" style="html=1;rounded=1;curved=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startSize=6;endSize=6;noEdgeStyle=1;orthogonal=1;" parent="66" source="81" target="83" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="545" y="2100" as="sourcePoint"/>
                         <Array as="points">
@@ -302,7 +302,7 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="83" value="true" style="whiteSpace=wrap;html=1;" vertex="1" parent="66">
+                <mxCell id="83" value="true" style="whiteSpace=wrap;html=1;" parent="66" vertex="1">
                     <mxGeometry x="20" y="400" width="100" height="40" as="geometry"/>
                 </mxCell>
             </root>
