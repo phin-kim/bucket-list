@@ -120,7 +120,8 @@ export const useAppStore = create<AppState>((set,get) => {
         set ({ error: "" });
         try {
             await signInWithEmailAndPassword(auth, email, password);
-        } catch (err) {
+        } 
+        catch (err) {
             const error = err as FirebaseError;
             let message = "An error occurred while signing in.";
             if (error.code) {
@@ -137,7 +138,7 @@ export const useAppStore = create<AppState>((set,get) => {
                 default:
                 message = error.message;
             }
-            }
+        }
             setTimedError(message);
             console.log("Email:", email);
             console.log("Password:", password);

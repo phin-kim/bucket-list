@@ -1,6 +1,7 @@
-import Bucket from "./Bucket"
+//import Bucket from "./Bucket"
 import { useEffect } from "react";
-import {  Routes, Route } from "react-router-dom";
+//import {  Routes, Route } from "react-router-dom";
+import Gf from "./Stupid"
 function App() {
   useEffect(() => {
   if (window.location.search === "?") {
@@ -9,9 +10,10 @@ function App() {
 }, []);
 
   return (
-      <Routes>
+      /*<Routes>
         <Route path="/" element={<Bucket />}/>
-      </Routes>
+      </Routes>*/
+      <Gf/>
       
   )
 }
